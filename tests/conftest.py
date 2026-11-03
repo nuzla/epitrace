@@ -3,10 +3,10 @@ from pathlib import Path
 
 import pytest
 
-import epiinfer
-from epiinfer import load_dataset
+import epitrace
+from epitrace import load_dataset
 
-DEMO = Path(epiinfer.__file__).parent / "demo_data"
+DEMO = Path(epitrace.__file__).parent / "demo_data"
 
 
 @pytest.fixture(scope="session")

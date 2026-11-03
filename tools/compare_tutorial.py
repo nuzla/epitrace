@@ -44,8 +44,8 @@ def compare(results: Path, expected: Path) -> list[str]:
                 elif not a[c].astype(str).equals(b[c].astype(str)):
                     problems.append(f"{exp.name}: column {c!r} differs")
         elif exp.suffix == ".txt":
-            la = [ln for ln in got.read_text().splitlines() if not ln.startswith("epiinfer ")]
-            lb = [ln for ln in exp.read_text().splitlines() if not ln.startswith("epiinfer ")]
+            la = [ln for ln in got.read_text().splitlines() if not ln.startswith("epitrace ")]
+            lb = [ln for ln in exp.read_text().splitlines() if not ln.startswith("epitrace ")]
             if la != lb:
                 problems.append(f"{exp.name}: text differs")
     return problems

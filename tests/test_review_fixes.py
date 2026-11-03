@@ -7,12 +7,12 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from epiinfer import Config, DataFormatError, load_dataset
-from epiinfer.cli import main
-from epiinfer.config import PAPER
-from epiinfer.core import EpiInferCore
-from epiinfer.data import detect_state_codes
-from epiinfer.forecast import build_model, forecast, run
+from epitrace import Config, DataFormatError, load_dataset
+from epitrace.cli import main
+from epitrace.config import PAPER
+from epitrace.core import EpiInferCore
+from epitrace.data import detect_state_codes
+from epitrace.forecast import build_model, forecast, run
 
 
 # --- look-ahead -----------------------------------------------------------------------
@@ -75,7 +75,7 @@ def test_state_code_swap_keeps_codes_unique():
 
 def test_notebook_avg_contacts_column_accepted(tmp_path, demo_path):
     """The ABM notebook writes `avg_contacts`, not `c`; the check used to crash on it."""
-    from epiinfer.data import validate_age_mapping
+    from epitrace.data import validate_age_mapping
     d = tmp_path / "nb"
     shutil.copytree(demo_path, d)
     a = pd.read_csv(d / "daily_group_avg_contacts.csv").rename(columns={"c": "avg_contacts"})
@@ -142,7 +142,7 @@ def test_forecast_rejects_out_of_range_origin(demo_path):
 
 def test_history_covers_long_incubation(data):
     """The fixed 8-day history dropped A cohorts when inc > 7."""
-    from epiinfer.forecast import _lookback
+    from epitrace.forecast import _lookback
     model = build_model(data, PAPER.with_(inc=12, duration=9))
     assert _lookback("unknown_both", model) >= 12 + 1
     assert _lookback("unknown_both", build_model(data, PAPER)) == 8      # paper value kept
@@ -169,11 +169,11 @@ def test_missing_optional_extra_gives_install_hint(tmp_path, demo_path, monkeypa
     """A base install used to crash with a bare ModuleNotFoundError on --plots."""
     import sys
     monkeypatch.setitem(sys.modules, "matplotlib", None)       # import -> ImportError
-    with pytest.raises(SystemExit, match="epiinfer\\[plots\\]"):
+    with pytest.raises(SystemExit, match="epitrace\\[plots\\]"):
         main(["run", "--data", str(demo_path), "--method", "empirical_p1", "--start-eval", "44",
               "--num-sims", "1", "--out", str(tmp_path), "--plots"])
     monkeypatch.setitem(sys.modules, "statsmodels", None)
-    with pytest.raises(SystemExit, match="epiinfer\\[baselines\\]"):
+    with pytest.raises(SystemExit, match="epitrace\\[baselines\\]"):
         main(["baseline", "--data", str(demo_path)])
 
 
@@ -187,7 +187,7 @@ def test_cli_simulate_per_group_rates(tmp_path):
 
 
 def test_reproduce_jobs_give_identical_results(demo_path):
-    from epiinfer.reproduce import reproduce_table
+    from epitrace.reproduce import reproduce_table
     kw = dict(quick=True, methods=("known_both", "known_p1"))
     serial = reproduce_table("age_structured", demo_path, jobs=1, **kw)
     parallel = reproduce_table("age_structured", demo_path, jobs=2, **kw)
@@ -198,7 +198,7 @@ def test_reproduce_jobs_give_identical_results(demo_path):
 
 # --- fetch ----------------------------------------------------------------------------
 def _serve(monkeypatch, archive):
-    import epiinfer.fetch as f
+    import epitrace.fetch as f
     monkeypatch.setattr(f.urllib.request, "urlretrieve",
                         lambda url, dest: shutil.copy(archive, dest))
     return f
@@ -240,7 +240,7 @@ def test_last_origin_limits_origins_not_targets(data):
 
 def test_baseline_window_matches_epiinfer(data):
     pytest.importorskip("statsmodels")
-    from epiinfer.baselines import rolling_baseline
+    from epitrace.baselines import rolling_baseline
     b = rolling_baseline(data, "arima", horizons=(1, 3), start_eval=36, max_day=42)
     e = run(data, "empirical_p1", start_eval=36, max_day=42, num_sims=1, horizons=(1, 3)).summary()
     e = e[e["group"] == "ALL"].set_index("horizon")["n"]
@@ -263,8 +263,8 @@ def test_string_age_labels_in_individual_file(tmp_path, demo_path):
 
 def test_reproduce_flags_wrong_dataset(tmp_path, demo_path, capsys):
     """Running a table on the wrong data must say so instead of printing a silent mismatch."""
-    from epiinfer.reproduce import reproduce_table
-    from epiinfer.reproduce.run import check_dataset, fingerprint
+    from epitrace.reproduce import reproduce_table
+    from epitrace.reproduce.run import check_dataset, fingerprint
     data = load_dataset(demo_path)
     assert fingerprint(data) == (600, 46, int(max(data.gt_total.values())))
     assert check_dataset("openabm", data).startswith("MISMATCH")
@@ -277,7 +277,7 @@ def test_reproduce_flags_wrong_dataset(tmp_path, demo_path, capsys):
 
 def test_hw_table_runs(demo_path):
     pytest.importorskip("statsmodels")
-    from epiinfer.reproduce import reproduce_table
+    from epitrace.reproduce import reproduce_table
     df = reproduce_table("hw_age_structured", demo_path)
     assert list(df["horizon"]) == [1, 5, 10, 20] and df["rmse"].notna().all()
 
@@ -290,7 +290,7 @@ def test_holt_winters_clips_and_falls_back():
 
     from statsmodels.tsa.holtwinters import ExponentialSmoothing
 
-    from epiinfer.baselines import _holt_winters
+    from epitrace.baselines import _holt_winters
     y = np.array([400, 330, 260, 190, 120, 60, 25, 8], float)          # collapsing epidemic
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
@@ -305,7 +305,7 @@ def test_holt_winters_clips_and_falls_back():
 def test_authors_run_targets_complete_and_consistent():
     """The authors' own run covers every (mode, horizon) the paper table has, and the knowledge
     modes behave as theory says: knowing more never hurts the 1-day forecast by much."""
-    from epiinfer.reproduce.targets import AUTHORS_RUN_AGE_STRUCTURED, TABLES
+    from epitrace.reproduce.targets import AUTHORS_RUN_AGE_STRUCTURED, TABLES
     spec = TABLES["age_structured"]
     assert set(AUTHORS_RUN_AGE_STRUCTURED) == set(spec["targets"])
     kb = AUTHORS_RUN_AGE_STRUCTURED[("known_both", 1)][0]
@@ -314,7 +314,7 @@ def test_authors_run_targets_complete_and_consistent():
 
 
 def test_reproduce_adds_authors_columns_only_where_available(demo_path):
-    from epiinfer.reproduce import reproduce_table
+    from epitrace.reproduce import reproduce_table
     age = reproduce_table("age_structured", demo_path, quick=True, methods=("known_both",))
     assert {"authors_rmse", "authors_ratio"} <= set(age.columns) and age["authors_rmse"].notna().all()
     oab = reproduce_table("openabm", demo_path, quick=True)

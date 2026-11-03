@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "epiinfer"
-version = "0.2.1"
-description = "EpiInfer-CONTACT: forecasting infection counts in epidemics from contact-tracing data (reproduction code for the Algorithms 2025 paper)"
+name = "epitrace"
+version = "0.3.0"
+description = "epiinfer-contact-tracing: forecasting infection counts in epidemics from contact-tracing data (reproduction code for the EpiInfer-CONTACT paper, Algorithms 2025)"
 readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"
@@ -19,21 +19,21 @@ plots = ["matplotlib>=3.7"]
 # scipy is only a transitive dependency of statsmodels; builds older than 1.16 fail to load
 # on current macOS (dlopen "__thread_bss" error), so the floor is pinned here.
 baselines = ["statsmodels>=0.14", "scipy>=1.16"]
-all = ["epiinfer[plots,baselines]"]
+all = ["epitrace[plots,baselines]"]
 
 [dependency-groups]
 dev = ["pytest>=8", "ruff>=0.5", "cffconvert>=2.0", "pyyaml>=6.0"]
 
 [project.scripts]
-epiinfer = "epiinfer.cli:main"
+epitrace = "epitrace.cli:main"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/epiinfer"]
+packages = ["src/epitrace"]
 
 [tool.hatch.build.targets.sdist]
 # everything needed to run the test suite from the sdist alone (CI runs it from the sdist:
 # tests/test_docker_files.py reads docker/ and .github/)
-include = ["src/epiinfer", "tests", "tools", "examples", "docs", "docker", ".github", "README.md",
+include = ["src/epitrace", "tests", "tools", "examples", "docs", "docker", ".github", "README.md",
            "LICENSE", "CHANGELOG.md", "CITATION.cff", "pyproject.toml", "uv.lock", ".python-version"]
 
 [tool.ruff]
@@ -46,4 +46,4 @@ ignore = ["E741", "B905"]   # S/A/I/R compartment names; zip lengths are equal b
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-markers = ["paper: needs the paper datasets (EPIINFER_PAPER_DATA)"]
+markers = ["paper: needs the paper datasets (EPITRACE_PAPER_DATA)"]

@@ -1,1 +1,1 @@
-epiinfer 0.2.1
+epitrace 0.3.0

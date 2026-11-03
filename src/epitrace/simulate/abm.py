@@ -9,7 +9,7 @@ returns to S); I recovers after ``inf_dur`` days and R returns to S after ``rec_
 
 Reproducibility note: this is the *same model* as the notebook but not the same random
 stream, so a regenerated dataset is statistically equivalent to, not byte-identical with,
-the datasets shipped with the paper. Use ``epiinfer fetch-data`` for the exact files.
+the datasets shipped with the paper. Use ``epitrace fetch-data`` for the exact files.
 """
 
 from __future__ import annotations

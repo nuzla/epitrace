@@ -1,7 +1,10 @@
 # Paper vs. code
 
 These notes come from porting the research code into this library and re-running it against
-the paper. Three code versions are covered:
+the paper. **Names:** the paper's "EpiInfer-contact" (and "EpiInfer-CONTACT") is what this
+documentation calls epiinfer-contact-tracing; "EpiInfer" is the authors' earlier system without
+contact tracing. This page quotes the paper's table and column names as printed. Three code
+versions are covered:
 
 - **The 2025 scripts** (`epiinfer_paper_aligned.py`, `epiinfer_empirical_p1.py`), which are
   the library's `contact` engine. They produced most EpiInfer-contact tables.
@@ -70,8 +73,8 @@ harder to forecast, so the two columns are not comparable.
 On the same 25–99 window, ARIMA scores 20.0 / 85.4 / 97.7 / 111.8. At day 20 that beats
 EpiInfer-contact's 156.9 (paper) / 158.0 (this library).
 
-- `epiinfer reproduce --table arima_age_structured` reproduces the paper's ARIMA column.
-- `epiinfer baseline --which arima` gives ARIMA on the EpiInfer window.
+- `epitrace reproduce --table arima_age_structured` reproduces the paper's ARIMA column.
+- `epitrace baseline --which arima` gives ARIMA on the EpiInfer window.
 
 The Holt-Winters column was computed on a different dataset; see item 5.
 
@@ -255,7 +258,7 @@ pairs × 4 knowledge cases × days 1/5/10/20, RMSE and fRMSE. The library's
 `summarize_relative` recomputes that file **exactly** from the authors' `abm_predictions.csv`
 (`tests/test_final_engine.py`).
 
-**The method changed in seven ways** (`epiinfer.final`):
+**The method changed in seven ways** (`epitrace.final`):
 
 | | 2025 code (`contact` engine) | October 2026 (`final` engine) |
 |---|---|---|

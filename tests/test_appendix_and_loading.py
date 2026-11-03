@@ -6,11 +6,11 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from epiinfer import load_dataset, run
-from epiinfer.cli import main
-from epiinfer.data import load_curve
-from epiinfer.reproduce.appendix import SCALES, load_targets, reproduce_appendix, scenarios
-from epiinfer.simulate import AgeMixConfig, simulate, write_dataset
+from epitrace import load_dataset, run
+from epitrace.cli import main
+from epitrace.data import load_curve
+from epitrace.reproduce.appendix import SCALES, load_targets, reproduce_appendix, scenarios
+from epitrace.simulate import AgeMixConfig, simulate, write_dataset
 
 
 # ---- max_day --------------------------------------------------------------------------
@@ -29,7 +29,7 @@ def test_run_loads_only_what_it_uses(demo_path, monkeypatch):
     loading everything: nothing after max_day is ever read by the model."""
     import sys
 
-    F = sys.modules["epiinfer.forecast"]       # `epiinfer.forecast` the attribute is the function
+    F = sys.modules["epitrace.forecast"]       # `epitrace.forecast` the attribute is the function
     seen = []
     orig = F.load_dataset
     monkeypatch.setattr(F, "load_dataset", lambda p, **kw: seen.append(kw) or orig(p, **kw))
@@ -57,7 +57,7 @@ def test_load_curve_from_states_total_and_from_states(tmp_path, demo_path):
 def test_baseline_runs_without_any_contact_file(tmp_path, demo_path):
     """The paper's uniform-contact data has states_total.csv but no timed_edges.csv."""
     pytest.importorskip("statsmodels")
-    from epiinfer.baselines import rolling_baseline
+    from epitrace.baselines import rolling_baseline
     d = tmp_path / "curve_only"
     d.mkdir()
     shutil.copy(demo_path / "states_total.csv", d / "states_total.csv")
@@ -110,7 +110,7 @@ def test_reproduce_appendix_runs_and_compares(mini_appendix):
 def test_reproduce_appendix_uses_one_rate_pair_for_every_group(mini_appendix, monkeypatch):
     """Appendix datasets have ONE (p1, p2) and many age groups; known_both must be given it for
     every group (the paper-default 3-element tuple would crash or mis-size)."""
-    import epiinfer.reproduce.appendix as A
+    import epitrace.reproduce.appendix as A
     seen = {}
     orig = A.rolling_forecast
 
@@ -166,7 +166,7 @@ def test_appendix_contact_handles_a_different_number_of_age_groups(five_group_ap
 def test_appendix_arima_uses_the_authors_origin_window(mini_appendix):
     """ARIMA is scored on forecast origins 10-50 (the authors' notebook), not EpiInfer's 25-99."""
     pytest.importorskip("statsmodels")
-    from epiinfer.baselines import rolling_baseline
+    from epitrace.baselines import rolling_baseline
     df = reproduce_appendix(mini_appendix, "0.2", methods=("arima",))
     direct = rolling_baseline(mini_appendix / "p1_0.12_p2_0.05", "arima", tuple(range(1, 21)),
                               start_eval=10, last_origin=50)
@@ -177,8 +177,8 @@ def test_holt_winters_table_scores_targets_beyond_day_100(tmp_path):
     """The notebook scores origins 25-99 against targets up to day 119 on its 365-day curve;
     reproduce must load that far (it used to stop at the origin limit)."""
     pytest.importorskip("statsmodels")
-    from epiinfer.baselines import rolling_baseline
-    from epiinfer.reproduce import reproduce_table
+    from epitrace.baselines import rolling_baseline
+    from epitrace.reproduce import reproduce_table
     rng = np.random.default_rng(0)
     days = np.arange(0, 140)
     curve = 500 * np.exp(-((days - 40) / 25.0) ** 2) + rng.normal(0, 5, days.size)

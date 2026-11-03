@@ -29,7 +29,7 @@ def _need_statsmodels():
         import statsmodels  # noqa: F401
     except ImportError as exc:  # pragma: no cover
         raise ImportError("baselines need statsmodels: install the extra, e.g. "
-                          "`uv sync --extra baselines` or `pip install 'epiinfer[baselines]'`") from exc
+                          "`uv sync --extra baselines` or `pip install 'epitrace[baselines]'`") from exc
 
 
 def _arima(series, steps):
@@ -63,7 +63,7 @@ def rolling_baseline(data: Dataset | dict | str | Path, name: str = "arima", hor
                      ) -> pd.DataFrame:
     """Rolling-origin RMSE / fRMSE of a baseline on the total symptomatic count.
 
-    The defaults match the EpiInfer evaluation (origins 25-99). The paper's ARIMA column
+    The defaults match the epiinfer-contact-tracing evaluation (origins 25-99). The paper's ARIMA column
     used origins 10-50 instead (``start_eval=10, last_origin=50``), which reproduces its
     published ARIMA numbers exactly on the age-structured dataset. ``window`` is the number
     of trailing days each fit sees (``"default"``: whole history for ARIMA, 14 for HW).
@@ -89,7 +89,7 @@ def rolling_baseline(data: Dataset | dict | str | Path, name: str = "arima", hor
         lo = 0 if window is None else max(0, day - window)
         fc = fn(y[lo:day + 1], max(horizons))
         for h in horizons:
-            if day + h <= min(max_day, len(y) - 1):      # same targets as EpiInfer
+            if day + h <= min(max_day, len(y) - 1):      # same targets as epiinfer-contact-tracing
                 preds[h].append(fc[h - 1])
                 acts[h].append(y[day + h])
     return pd.DataFrame([{"method": name, "horizon": h, "n": len(preds[h]),

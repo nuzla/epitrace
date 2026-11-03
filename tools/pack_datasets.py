@@ -5,7 +5,7 @@
 
 The zips are deterministic (fixed timestamps, permissions and member order), so packing the
 same data again gives the same SHA-256. Copy the printed lines into
-``src/epiinfer/checksums.txt`` so ``epiinfer fetch-data`` verifies downloads by default.
+``src/epitrace/checksums.txt`` so ``epitrace fetch-data`` verifies downloads by default.
 """
 
 import sys
@@ -13,7 +13,7 @@ import zipfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
-from epiinfer.fetch import sha256  # noqa: E402
+from epitrace.fetch import sha256  # noqa: E402
 
 FILES = ["age_group_population.csv", "daily_group_avg_contacts.csv", "daily_group_infected.csv",
          "individual_age_group.csv", "individual_day_state.csv", "states_total.csv",
@@ -22,7 +22,7 @@ EPOCH = (1980, 1, 1, 0, 0, 0)
 
 
 def pack(name: str, folder: str | Path, out_dir: Path) -> Path:
-    archive = out_dir / f"epiinfer-data-{name}.zip"
+    archive = out_dir / f"epitrace-data-{name}.zip"
     with zipfile.ZipFile(archive, "w") as z:
         for f in FILES:                                    # fixed order
             p = Path(folder) / f

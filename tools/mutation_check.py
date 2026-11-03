@@ -139,8 +139,8 @@ def main() -> int:
             continue
         with tempfile.TemporaryDirectory() as tmp:
             work = Path(tmp) / "pkg"
-            shutil.copytree(ROOT / "src" / "epiinfer", work / "epiinfer")
-            target = work / "epiinfer" / rel
+            shutil.copytree(ROOT / "src" / "epitrace", work / "epitrace")
+            target = work / "epitrace" / rel
             text = target.read_text()
             if old not in text:
                 print(f"STALE   {rel}: pattern not found: {old[:50]!r}")

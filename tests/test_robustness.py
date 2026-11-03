@@ -6,11 +6,11 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from epiinfer import FINAL, Config, DataFormatError, forecast, load_dataset, run
-from epiinfer.cli import main
-from epiinfer.convert import cases_to_dataset
-from epiinfer.forecast import ROW_COLUMNS, SUMMARY_COLUMNS
-from epiinfer.simulate import AgeMixConfig, simulate, write_dataset
+from epitrace import FINAL, Config, DataFormatError, forecast, load_dataset, run
+from epitrace.cli import main
+from epitrace.convert import cases_to_dataset
+from epitrace.forecast import ROW_COLUMNS, SUMMARY_COLUMNS
+from epitrace.simulate import AgeMixConfig, simulate, write_dataset
 
 KNOWN = dict(p1_true=(0.15,), p2_true=(0.1,))
 
@@ -71,7 +71,7 @@ def test_run_needs_enough_history_before_the_first_origin(demo_path):
 
 def test_compartmental_engine_needs_history_before_its_first_origin(demo_path):
     """Earlier origins indexed the history from the end of the arrays (negative days)."""
-    from epiinfer.compartmental import GroupCounts, run_compartmental
+    from epitrace.compartmental import GroupCounts, run_compartmental
     with pytest.raises(ValueError, match="start_eval must be 11"):
         run(demo_path, "unknown_both", engine="compartmental", start_eval=5)
     with pytest.raises(ValueError, match="start_eval must be 6"):
@@ -100,13 +100,13 @@ def test_compartmental_loader_names_missing_columns(tmp_path, demo_path):
     shutil.copytree(demo_path, d)
     pd.read_csv(d / "daily_group_avg_contacts.csv").drop(columns=["c"]).to_csv(
         d / "daily_group_avg_contacts.csv", index=False)
-    with pytest.raises(SystemExit, match="epiinfer: daily_group_avg_contacts.csv: needs a column c"):
+    with pytest.raises(SystemExit, match="epitrace: daily_group_avg_contacts.csv: needs a column c"):
         main(["forecast", "--data", str(d), "--engine", "compartmental", "--method",
               "known_both", "--p1-true", "0.15", "--p2-true", "0.1"])
 
 
 def test_final_calibration_day_is_checked(demo_path):
-    from epiinfer.final import FinalData, FinalSettings, calibrate_at
+    from epitrace.final import FinalData, FinalSettings, calibrate_at
     fd = FinalData.from_folder(demo_path)
     with pytest.raises(ValueError, match="calibration day"):
         calibrate_at(fd, "unknown_both", 15, settings=FinalSettings())
@@ -128,7 +128,7 @@ def test_contact_engine_refuses_data_without_the_presymptomatic_state(tmp_path, 
         run(d, "empirical_p1", start_eval=30, max_day=34, num_sims=1)
     with pytest.raises(ValueError, match="pre-symptomatic state"):
         forecast(d, horizon=2, method="known_both", engine="contact", num_sims=1, **rates)
-    with pytest.raises(SystemExit, match="epiinfer: the contact engine needs"):
+    with pytest.raises(SystemExit, match="epitrace: the contact engine needs"):
         main(["forecast", "--data", str(d), "--engine", "contact", "--num-sims", "1"])
     assert len(forecast(d, horizon=2, method="known_both", num_sims=1, **KNOWN)) == 2   # final: fine
 
@@ -156,7 +156,7 @@ def test_config_rejects_impossible_values(kw, match):
 
 
 def test_final_settings_reject_impossible_values():
-    from epiinfer.final import FinalSettings, run_final
+    from epitrace.final import FinalSettings, run_final
     with pytest.raises(ValueError, match="calib_window"):
         FinalSettings(calib_window=3)
     with pytest.raises(ValueError, match="recalib_every"):
@@ -196,9 +196,9 @@ def test_cli_run_says_when_nothing_could_be_scored(tmp_path, demo_path):
 
 
 def test_cli_reports_bad_input_in_one_line(tmp_path, demo_path):
-    with pytest.raises(SystemExit, match="epiinfer: dataset folder not found"):
+    with pytest.raises(SystemExit, match="epitrace: dataset folder not found"):
         main(["run", "--data", str(tmp_path / "nowhere")])
-    with pytest.raises(SystemExit, match="epiinfer: case 'unknown_both'.*22"):
+    with pytest.raises(SystemExit, match="epitrace: case 'unknown_both'.*22"):
         main(["run", "--data", str(demo_path), "--start-eval", "15", "--num-sims", "1",
               "--out", str(tmp_path)])
     with pytest.raises(ValueError, match="22"):             # -v keeps the traceback
@@ -275,7 +275,7 @@ def test_an_empty_state_file_is_a_data_error(tmp_path, demo_path):
     pd.DataFrame(columns=["id", "day", "state"]).to_csv(d / "individual_day_state.csv", index=False)
     with pytest.raises(DataFormatError, match="no rows"):
         load_dataset(d)
-    from epiinfer.final import FinalData
+    from epitrace.final import FinalData
     with pytest.raises(DataFormatError, match="no rows"):
         FinalData.from_folder(d)
 
@@ -303,6 +303,6 @@ def test_describe_a_folder_nobody_is_infected_in(tmp_path, capsys):
 
 def test_config_default_still_validates_the_paper_presets():
     assert Config().num_sims == 10
-    from epiinfer import COMPARTMENTAL, OPENABM, PAPER
+    from epitrace import COMPARTMENTAL, OPENABM, PAPER
     assert PAPER.p1_true == (0.25, 0.15, 0.08) and OPENABM.smoothing == 1.0
     assert COMPARTMENTAL.engine == "compartmental" and FINAL.engine == "final"

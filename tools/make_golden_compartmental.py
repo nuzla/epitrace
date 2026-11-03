@@ -7,7 +7,7 @@
 Both notebooks run unchanged. They read their data from ``~/Desktop/abmcontact10000april0.2``
 and write Excel files there, so HOME points at a temporary folder in which the demo data is
 the single scenario ``p1_0.15_p2_0.1``. (``openpyxl`` is needed only because the notebooks
-write .xlsx.) The library's port (src/epiinfer/compartmental.py) must reproduce every number.
+write .xlsx.) The library's port (src/epitrace/compartmental.py) must reproduce every number.
 
 The base-case notebook's only cell, as saved, holds a truncated copy of the code (it stops
 mid-statement, so the cell as a whole is a SyntaxError) followed by the complete code. Only
@@ -25,7 +25,7 @@ from pathlib import Path
 
 import numpy as np
 
-DEMO = Path(__file__).resolve().parents[1] / "src" / "epiinfer" / "demo_data"
+DEMO = Path(__file__).resolve().parents[1] / "src" / "epitrace" / "demo_data"
 P1, P2 = 0.15, 0.1
 
 

@@ -1,4 +1,4 @@
-# Publishes the Docker image to GitHub Container Registry: ghcr.io/<owner>/epiinfer
+# Publishes the Docker image to GitHub Container Registry: ghcr.io/<owner>/epitrace
 #
 #   release:  git tag v0.1.0 && git push origin v0.1.0     -> pushes 0.1.0, 0.1 and latest
 #   dry run:  Actions -> publish -> Run workflow            -> builds both architectures,
@@ -58,16 +58,16 @@ jobs:
           file: docker/Dockerfile
           platforms: linux/amd64
           load: true
-          tags: epiinfer:smoke
+          tags: epitrace:smoke
           cache-from: type=gha
       - name: Smoke test (arbitrary non-root user)
         run: |
           mkdir -p results
-          DEMO="$(docker run --rm epiinfer:smoke demo)"
-          docker run --rm epiinfer:smoke --version
-          docker run --rm epiinfer:smoke forecast --data "$DEMO" --horizon 3 --num-sims 3
+          DEMO="$(docker run --rm epitrace:smoke demo)"
+          docker run --rm epitrace:smoke --version
+          docker run --rm epitrace:smoke forecast --data "$DEMO" --horizon 3 --num-sims 3
           docker run --rm --user "$(id -u):$(id -g)" -v "$PWD/results:/work/results" \
-            epiinfer:smoke run --data "$DEMO" --method empirical_p1 --start-eval 40 --num-sims 2 --plots
+            epitrace:smoke run --data "$DEMO" --method empirical_p1 --start-eval 40 --num-sims 2 --plots
           ls results/summary_demo_data_empirical_p1.csv results/forecast_demo_data_empirical_p1.png
 
       # 2) the multi-architecture image: always built (so a dry run proves arm64 compiles),

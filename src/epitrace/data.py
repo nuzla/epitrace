@@ -19,7 +19,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-log = logging.getLogger("epiinfer")
+log = logging.getLogger("epitrace")
 
 
 class DataFormatError(ValueError):

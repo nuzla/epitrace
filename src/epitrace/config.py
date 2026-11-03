@@ -2,15 +2,15 @@
 
 Three engines implement the three versions of the method:
 
-* ``engine="final"`` – the October 2026 paper (``abm_final.ipynb``, :mod:`epiinfer.final`):
+* ``engine="final"`` – the October 2026 paper (``abm_final.ipynb``, :mod:`epitrace.final`):
   exposures rebuilt from infections (no pre-symptomatic data needed), recovered people return
   to susceptible, periodic joint-grid calibration. Preset :data:`FINAL`; the default of
-  :func:`epiinfer.run` and :func:`epiinfer.forecast`.
-* ``engine="contact"`` – the 2025 code behind the earlier tables (:mod:`epiinfer.core`). Presets:
+  :func:`epitrace.run` and :func:`epitrace.forecast`.
+* ``engine="contact"`` – the 2025 code behind the earlier tables (:mod:`epitrace.core`). Presets:
   :data:`PAPER` (grid-search calibration of per-age ``p1``/``p2``) and :data:`OPENABM`
   (``p2`` fixed at 1, ``p1`` refit every day from observed S->A transitions).
 * ``engine="compartmental"`` – EpiInfer, the earlier compartmental model the paper compares
-  against (:mod:`epiinfer.compartmental`). It is deterministic and uses no contact list: only
+  against (:mod:`epitrace.compartmental`). It is deterministic and uses no contact list: only
   symptomatic counts and average contacts per age group. Preset :data:`COMPARTMENTAL`.
 """
 

@@ -1,8 +1,8 @@
-"""The final EpiInfer-contact method of the October 2026 paper (``abm_final.ipynb``).
+"""The final epiinfer-contact-tracing method of the October 2026 paper (``abm_final.ipynb``).
 
 A faithful port: same algorithm, same random-number calls and seeds, so it reproduces the
 authors' notebook exactly (``tests/test_final_engine.py`` checks it against the notebook's own
-code). Differences from the 2025 ("contact") engine in :mod:`epiinfer.core`:
+code). Differences from the 2025 ("contact") engine in :mod:`epitrace.core`:
 
 * **No pre-symptomatic (A) data needed.** The exposure history is rebuilt from observed
   infections: people first seen infected on day e+inc were exposed on day e, plus
@@ -166,7 +166,7 @@ class FinalData:
 
     @classmethod
     def from_dataset(cls, ds) -> FinalData:
-        """Build from a :class:`epiinfer.data.Dataset` (uses only its I and R sets)."""
+        """Build from a :class:`epitrace.data.Dataset` (uses only its I and R sets)."""
         T = max(ds.all_days) + 1
         S = np.zeros((T, ds.population_total), dtype=np.int8)
         for day in ds.all_days:

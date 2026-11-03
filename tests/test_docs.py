@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pandas as pd
 
-import epiinfer
+import epitrace
 
 ROOT = Path(__file__).resolve().parents[1]
 DOCS = [ROOT / "README.md", ROOT / "CHANGELOG.md", *sorted((ROOT / "docs").glob("*.md"))]
@@ -19,7 +19,7 @@ def _prose(path: Path) -> str:
 
 
 def test_relative_links_and_images_resolve():
-    """Links must work on GitHub and on the published site (nuzla.github.io/epiinfer, built from
+    """Links must work on GitHub and on the published site (nuzla.github.io/epitrace, built from
     docs/ alone): from a page in docs/ they must name a file inside docs/. A folder or a file
     outside docs/ (../examples/...) opens on GitHub but is a 404 on the site; use a full URL."""
     docs_dir = ROOT / "docs"
@@ -42,14 +42,14 @@ def test_every_version_string_agrees():
     """A release changes the version in five places; forgetting one ships a tutorial whose
     commands pull another image or whose expected output names another version."""
     version = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]["version"]
-    assert epiinfer.__version__ == version
+    assert epitrace.__version__ == version
     assert re.search(rf"^version: {re.escape(version)}$", (ROOT / "CITATION.cff").read_text(), re.M)
-    assert (OUTPUTS / "00_version.txt").read_text().strip() == f"epiinfer {version}"
+    assert (OUTPUTS / "00_version.txt").read_text().strip() == f"epitrace {version}"
     tutorial = (ROOT / "docs" / "TUTORIAL.md").read_text()
-    assert f"epiinfer {version}" in tutorial and f"`epi --version` says {version}" in tutorial
+    assert f"epitrace {version}" in tutorial and f"`epi --version` says {version}" in tutorial
     tags = set()
     for path in [*DOCS, ROOT / "docs" / "tutorial" / "run_tutorial.sh"]:
-        tags |= set(re.findall(r"ghcr\.io/nuzla/epiinfer:([0-9][\w.\-]*)", path.read_text()))
+        tags |= set(re.findall(r"ghcr\.io/nuzla/epitrace:([0-9][\w.\-]*)", path.read_text()))
     assert tags == {version}, tags
 
 
@@ -60,7 +60,7 @@ def test_tutorial_shows_exactly_what_its_committed_outputs_contain():
     missing = []
     for name in ("01_describe.txt", "04_backtest_final.txt", "06_backtest_compartmental.txt"):
         for line in (OUTPUTS / name).read_text().splitlines():
-            if line.strip() and not line.startswith("epiinfer ") and line not in text:
+            if line.strip() and not line.startswith("epitrace ") and line not in text:
                 missing.append(f"{name}: {line}")
     # the 2025 engine prints a row per age group; the tutorial shows only the totals
     for line in (OUTPUTS / "05_backtest_contact.txt").read_text().splitlines():

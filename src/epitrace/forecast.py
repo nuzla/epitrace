@@ -26,7 +26,7 @@ from .core import EpiInferCore
 from .data import Dataset, load_dataset
 from .metrics import fractional_rmse, relative_rmse, rmse
 
-log = logging.getLogger("epiinfer")
+log = logging.getLogger("epitrace")
 
 #: columns of ``ForecastResult.rows`` (also when nothing could be scored) and of ``summary()``
 ROW_COLUMNS = ["group", "horizon", "current_day", "target_day", "predicted", "actual",
@@ -228,7 +228,7 @@ def _resolve(method: str, cfg: Config | None, overrides: dict) -> Config:
 
 # ---- final engine (October 2026) --------------------------------------------------------
 def final_settings(cfg: Config):
-    """The :class:`epiinfer.final.FinalSettings` equivalent of a :class:`Config`."""
+    """The :class:`epitrace.final.FinalSettings` equivalent of a :class:`Config`."""
     from .final import FinalSettings
     return FinalSettings(inc=cfg.inc, inf_dur=cfg.duration, rec_dur=cfg.rec_duration,
                          start_day=cfg.start_eval, end_day=cfg.max_day,

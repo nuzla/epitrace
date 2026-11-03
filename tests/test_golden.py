@@ -7,9 +7,9 @@ epiinfer_empirical_p1.py on the bundled demo data.
 import numpy as np
 import pytest
 
-from epiinfer import OPENABM, PAPER
-from epiinfer.calibrate import continuous_calibrate, estimate_p1, solve_p1
-from epiinfer.forecast import build_model
+from epitrace import OPENABM, PAPER
+from epitrace.calibrate import continuous_calibrate, estimate_p1, solve_p1
+from epitrace.forecast import build_model
 
 # Counts, ids and grid values are compared exactly. Anything computed with `**`/bisection
 # differs in the last digit between platforms (macOS vs Linux libm), so floats get a tight
@@ -107,7 +107,7 @@ def test_empirical_projection_matches_original(data, golden):
 def test_holt_winters_matches_authors_notebook(data, golden):
     """Same RMSE as the authors' own HW code (baselines_standalone.ipynb) on the demo data."""
     pytest.importorskip("statsmodels")
-    from epiinfer.baselines import rolling_baseline
+    from epitrace.baselines import rolling_baseline
     df = rolling_baseline(data, "holt_winters", horizons=(1, 5, 10, 20))
     got = {str(h): r for h, r in zip(df["horizon"], df["rmse"])}
     assert got.keys() == golden["holt_winters_notebook"].keys()
@@ -117,11 +117,11 @@ def test_holt_winters_matches_authors_notebook(data, golden):
 
 def test_arima_matches_pinned_values(data):
     """ARIMA(1,1,1) on the demo data. The same code reproduces the paper's ARIMA columns to
-    0.01 on the paper's data (the EPIINFER_PAPER_DATA tests), but that data is absent in CI, so
+    0.01 on the paper's data (the EPITRACE_PAPER_DATA tests), but that data is absent in CI, so
     changing the model order or the fit would go unnoticed there. These values pin it. (Not a
     fixture from the authors' notebook: its ARIMA code is the one-line fit used here.)"""
     pytest.importorskip("statsmodels")
-    from epiinfer.baselines import rolling_baseline
+    from epitrace.baselines import rolling_baseline
     df = rolling_baseline(data, "arima", horizons=(1, 5, 10, 20)).set_index("horizon")
     assert df["n"].tolist() == [20, 16, 11, 1]
     for h, want in {1: 3.7326204808216215, 5: 5.993318739968428, 10: 6.879549284757477,

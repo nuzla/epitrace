@@ -12,9 +12,9 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from epiinfer import COMPARTMENTAL, PAPER, forecast, load_dataset, run
-from epiinfer.cli import main
-from epiinfer.compartmental import GroupCounts, calibrate, run_compartmental, simulate, summarize
+from epitrace import COMPARTMENTAL, PAPER, forecast, load_dataset, run
+from epitrace.cli import main
+from epitrace.compartmental import GroupCounts, calibrate, run_compartmental, simulate, summarize
 
 HERE = Path(__file__).parent
 

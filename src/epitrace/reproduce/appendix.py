@@ -22,7 +22,7 @@ from ..data import load_dataset
 from ..forecast import build_model, rolling_forecast
 
 SCALES = ("0.2", "0.5", "2")          # "Base" (the unscaled data) is not among the supplied files
-#: "epiinfer_old" is EpiInfer, the earlier compartmental model (epiinfer.compartmental)
+#: "epiinfer_old" is EpiInfer, the earlier compartmental model (epitrace.compartmental)
 METHODS = ("arima", "contact", "epiinfer_old")
 HORIZONS = tuple(range(1, 21))
 _PAIR = re.compile(r"p1_([\d.]+)_p2_([\d.]+)$")
@@ -30,7 +30,7 @@ _PAIR = re.compile(r"p1_([\d.]+)_p2_([\d.]+)$")
 
 def load_targets() -> pd.DataFrame:
     """The paper's appendix numbers: columns p1, p2, scale, day, method, rmse."""
-    with files("epiinfer.reproduce").joinpath("appendix_targets.csv").open() as f:
+    with files("epitrace.reproduce").joinpath("appendix_targets.csv").open() as f:
         df = pd.read_csv(f, comment="#", dtype={"scale": str})
     return df
 

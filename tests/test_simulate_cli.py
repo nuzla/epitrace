@@ -1,9 +1,9 @@
 import numpy as np
 import pytest
 
-from epiinfer import load_dataset
-from epiinfer.cli import main
-from epiinfer.simulate import AgeMixConfig, simulate, write_dataset
+from epitrace import load_dataset
+from epitrace.cli import main
+from epitrace.simulate import AgeMixConfig, simulate, write_dataset
 
 
 def small(**kw):
@@ -78,8 +78,8 @@ def test_cli_simulate(tmp_path):
 
 
 def test_fetch_rejects_plain_http_and_no_url(monkeypatch):
-    from epiinfer.fetch import fetch
-    monkeypatch.delenv("EPIINFER_DATA_URL", raising=False)
+    from epitrace.fetch import fetch
+    monkeypatch.delenv("EPITRACE_DATA_URL", raising=False)
     with pytest.raises(SystemExit, match="no data URL"):
         fetch(None, "x")
     with pytest.raises(SystemExit, match="non-HTTPS"):
@@ -88,6 +88,6 @@ def test_fetch_rejects_plain_http_and_no_url(monkeypatch):
 
 def test_baselines_arima_runs(demo_path):
     pytest.importorskip("statsmodels")
-    from epiinfer.baselines import rolling_baseline
+    from epitrace.baselines import rolling_baseline
     df = rolling_baseline(load_dataset(demo_path), "arima", horizons=(1, 5), start_eval=25, max_day=44)
     assert set(df["horizon"]) == {1, 5} and np.isfinite(df["rmse"]).all()

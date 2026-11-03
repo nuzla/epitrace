@@ -1,6 +1,6 @@
 # GitHub Pages (Settings > Pages > Deploy from a branch: main, /docs) builds this folder with
-# Jekyll and serves it at https://nuzla.github.io/epiinfer/. The pages are the Markdown files
+# Jekyll and serves it at https://nuzla.github.io/epitrace/. The pages are the Markdown files
 # next to this one; index.md is the landing page.
-title: epiinfer
-description: Forecast infections from contact-tracing data (EpiInfer-CONTACT)
+title: epiinfer-contact-tracing
+description: Forecast infections from contact-tracing data (epiinfer-contact-tracing)
 theme: jekyll-theme-primer

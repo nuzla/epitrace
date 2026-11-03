@@ -2,21 +2,21 @@
 # Runs the commands of docs/TUTORIAL.md, steps 0-6, in order, and collects the outputs.
 #
 #   docs/tutorial/run_tutorial.sh                 # inside Docker (image below)
-#   IMAGE=epiinfer docs/tutorial/run_tutorial.sh  # a locally built image
-#   EPI_NATIVE=1 docs/tutorial/run_tutorial.sh    # without Docker, using `epiinfer` on PATH
+#   IMAGE=epitrace docs/tutorial/run_tutorial.sh  # a locally built image
+#   EPI_NATIVE=1 docs/tutorial/run_tutorial.sh    # without Docker, using `epitrace` on PATH
 #
 # Outputs go to $WORK/results (default ./tutorial-work/results). CI runs this inside the
 # Docker image and checks the CSVs against docs/tutorial/outputs/.
 set -euo pipefail
 
-IMAGE="${IMAGE:-ghcr.io/nuzla/epiinfer:0.2.1}"
+IMAGE="${IMAGE:-ghcr.io/nuzla/epitrace:0.3.0}"
 WORK="${WORK:-$PWD/tutorial-work}"
 mkdir -p "$WORK/data" "$WORK/results"
 WORK="$(cd "$WORK" && pwd)"
 
 if [ "${EPI_NATIVE:-0}" = 1 ]; then
   DATA="$WORK/data"
-  epi() { (cd "$WORK" && epiinfer "$@"); }
+  epi() { (cd "$WORK" && epitrace "$@"); }
 else
   DATA=/data
   epi() {
@@ -65,8 +65,8 @@ epi baseline --data "$DATA/my_epidemic" --which holt_winters --last-origin 79 \
 
 step "9. one chart: error by horizon for all five"
 epi plot-rmse \
-  "EpiInfer-contact, final engine=results/04_backtest_final/summary_my_epidemic_unknown_both.csv" \
-  "EpiInfer-contact, 2025 engine=results/05_backtest_contact/summary_my_epidemic_unknown_both.csv" \
+  "epiinfer-contact-tracing, final engine=results/04_backtest_final/summary_my_epidemic_unknown_both.csv" \
+  "epiinfer-contact-tracing, 2025 engine=results/05_backtest_contact/summary_my_epidemic_unknown_both.csv" \
   "EpiInfer (earlier)=results/06_backtest_compartmental/summary_my_epidemic_unknown_both.csv" \
   "ARIMA(1,1,1)=results/07_arima.csv" \
   "Holt-Winters=results/07_holt_winters.csv" \

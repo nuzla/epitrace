@@ -5,7 +5,7 @@
 
 The notebook's own code cells (config, data container, core, calibrator, runner) are executed
 unchanged; only the run length is shortened (END_DAY, HORIZONS, N_MC_RUNS) because the demo
-epidemic has 46 days. The library's port (src/epiinfer/final.py) must reproduce every number.
+epidemic has 46 days. The library's port (src/epitrace/final.py) must reproduce every number.
 """
 
 from __future__ import annotations
@@ -17,7 +17,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-DEMO = Path(__file__).resolve().parents[1] / "src" / "epiinfer" / "demo_data"
+DEMO = Path(__file__).resolve().parents[1] / "src" / "epitrace" / "demo_data"
 
 # shortened run used for the fixture (the library test uses the same FinalSettings)
 END_DAY, HORIZONS, N_MC = 46, [1, 5, 10], 3

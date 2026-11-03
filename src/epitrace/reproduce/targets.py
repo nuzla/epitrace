@@ -1,4 +1,4 @@
-"""Published numbers from the paper that ``epiinfer reproduce`` compares against.
+"""Published numbers from the paper that ``epitrace reproduce`` compares against.
 
 Values are the EpiInfer-contact columns of the paper's summary tables
 (``tab:age_structured``, ``tab:uniform``) and the new-method ("red") values of
@@ -81,7 +81,7 @@ HW_UNIFORM = {("holt_winters", 1): (90.51, None), ("holt_winters", 5): (139.44, 
 
 #: EpiInfer (the earlier compartmental model), "Both known" row of Table 14 = the EpiInfer
 #: column of Tables 2-5 (25 October 2026 PDF). The fraction is the relative fRMSE.
-#: Deterministic: reproduced exactly by epiinfer.compartmental with per-group exposure.
+#: Deterministic: reproduced exactly by epitrace.compartmental with per-group exposure.
 EPIINFER_AGE_STRUCTURED = {("known_both", 1): (180.1720, 0.2621),
                            ("known_both", 5): (408.3458, 0.5974),
                            ("known_both", 10): (161.6292, 0.2427),

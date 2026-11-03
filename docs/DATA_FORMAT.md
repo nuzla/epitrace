@@ -39,7 +39,7 @@ needs no individual records and no contact list: only daily counts per age group
 symptomatic, average contacts) and the totals. That makes it the option for aggregate
 surveillance data. In `daily_group_avg_contacts.csv` a missing day repeats the previous one.
 
-`epiinfer describe --data FOLDER` tells you which engines a folder supports.
+`epitrace describe --data FOLDER` tells you which engines a folder supports.
 
 Every day from 0 to the last day should be present in `individual_day_state.csv`. The last day
 that has any row is taken as the last observed day, so if you write only the I and R rows,
@@ -56,10 +56,10 @@ my_data/
 ```
 
 If your records are a case list (`person,onset`: who, and the date symptoms began) and a
-contact list (`date,a,b`), `epiinfer from-cases` writes this folder for you:
+contact list (`date,a,b`), `epitrace from-cases` writes this folder for you:
 
 ```bash
-epiinfer from-cases --cases cases.csv --contacts contacts.csv --out my_data \
+epitrace from-cases --cases cases.csv --contacts contacts.csv --out my_data \
     --duration 7 --rec-duration 7
 ```
 

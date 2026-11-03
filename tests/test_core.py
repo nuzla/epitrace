@@ -2,12 +2,12 @@ import numpy as np
 import pandas as pd
 import pytest
 
-import epiinfer
-from epiinfer import DataFormatError, fractional_rmse, load_dataset, rmse
-from epiinfer.calibrate import solve_p1
-from epiinfer.config import PAPER
-from epiinfer.core import EpiInferCore
-from epiinfer.forecast import forecast, run, sim_rng
+import epitrace
+from epitrace import DataFormatError, fractional_rmse, load_dataset, rmse
+from epitrace.calibrate import solve_p1
+from epitrace.config import PAPER
+from epitrace.core import EpiInferCore
+from epitrace.forecast import forecast, run, sim_rng
 
 
 def test_metrics():
@@ -123,7 +123,7 @@ def test_state_code_remap(tmp_path, demo_path):
     assert (st["state"] == 0).any()
     st["state"] = st["state"].replace({0: 9})
     st.to_csv(d / "individual_day_state.csv", index=False)
-    from epiinfer.data import detect_state_codes
+    from epitrace.data import detect_state_codes
     codes = detect_state_codes(st, pd.read_csv(d / "states_total.csv"))
     assert codes["S"] == 9
 
@@ -141,7 +141,7 @@ def test_id_out_of_range_rejected(tmp_path, demo_path):
 
 def test_public_api():
     for name in ("run", "forecast", "load_dataset", "Config", "PAPER", "OPENABM"):
-        assert hasattr(epiinfer, name)
+        assert hasattr(epitrace, name)
 
 
 def test_strict_vs_diff_transitions_on_sparse_records(tmp_path, demo_path):

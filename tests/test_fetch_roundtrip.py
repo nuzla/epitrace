@@ -8,8 +8,8 @@ from pathlib import Path
 
 import pytest
 
-import epiinfer.fetch as fetch_mod
-from epiinfer import load_dataset
+import epitrace.fetch as fetch_mod
+from epitrace import load_dataset
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -61,18 +61,18 @@ def test_pack_is_deterministic(tmp_path, demo_path):
 
 def test_fetch_verifies_against_packaged_checksums(served, tmp_path, monkeypatch):
     url, rel, sha = served
-    monkeypatch.setattr(fetch_mod, "known_checksums", lambda: {"epiinfer-data-demo.zip": sha})
-    out = fetch_mod.fetch(f"{url}/epiinfer-data-demo.zip", tmp_path / "data")
+    monkeypatch.setattr(fetch_mod, "known_checksums", lambda: {"epitrace-data-demo.zip": sha})
+    out = fetch_mod.fetch(f"{url}/epitrace-data-demo.zip", tmp_path / "data")
     assert load_dataset(out / "demo").population_total == 600
 
-    archive = rel / "epiinfer-data-demo.zip"                # tamper with the served file
+    archive = rel / "epitrace-data-demo.zip"                # tamper with the served file
     archive.write_bytes(archive.read_bytes()[:-8] + b"tampered")
     with pytest.raises(SystemExit, match="checksum mismatch"):
-        fetch_mod.fetch(f"{url}/epiinfer-data-demo.zip", tmp_path / "data2")
+        fetch_mod.fetch(f"{url}/epitrace-data-demo.zip", tmp_path / "data2")
     assert not (tmp_path / "data2" / "demo").exists()
 
 
 def test_packaged_checksum_list_is_well_formed():
     known = fetch_mod.known_checksums()
-    assert set(known) == {"epiinfer-data-age_structured.zip", "epiinfer-data-openabm.zip"}
+    assert set(known) == {"epitrace-data-age_structured.zip", "epitrace-data-openabm.zip"}
     assert all(len(v) == 64 and int(v, 16) >= 0 for v in known.values())

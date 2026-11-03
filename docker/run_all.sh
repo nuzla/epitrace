@@ -14,7 +14,7 @@ cd "$(dirname "$0")/.."
 
 DATA="${DATA:-$PWD/data}"
 OUT="${OUT:-$PWD/results}"
-IMAGE="${IMAGE:-epiinfer}"
+IMAGE="${IMAGE:-epitrace}"
 JOBS="${JOBS:-4}"
 mkdir -p "$DATA" "$OUT"
 DATA="$(cd "$DATA" && pwd)"; OUT="$(cd "$OUT" && pwd)"

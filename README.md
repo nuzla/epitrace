@@ -1,20 +1,26 @@
-# epiinfer
+# epiinfer-contact-tracing
 
-Python implementation of **EpiInfer-CONTACT** ("Forecasting Infection Rates in Epidemics
-Given Contact Tracing Information", Kascelan, Yang & Shasha, *Algorithms*, 2025). It is
-packaged so that anyone can:
+Python implementation of **epiinfer-contact-tracing** ("Forecasting Infection Rates in
+Epidemics Given Contact Tracing Information", Kascelan, Yang & Shasha, *Algorithms*, 2025).
+The package, the command and the Docker image are called **`epitrace`**. It is packaged so
+that anyone can:
 
 1. **reproduce** the paper's tables, and
 2. **forecast** with their own contact-tracing data.
 
-Given who met whom each day, EpiInfer-contact rolls an S → A → I → R epidemic forward on the
+**Names.** The paper calls this method *EpiInfer-CONTACT* (its tables say "EpiInfer-contact").
+Here it is *epiinfer-contact-tracing*, to tell it apart from *EpiInfer*, the authors' earlier
+system, which uses no contact tracing. Where this documentation quotes a paper table, it keeps
+the paper's column names.
+
+Given who met whom each day, epiinfer-contact-tracing rolls an S → A → I → R epidemic forward on the
 contact graph. Here A means infectious but not yet symptomatic, and I means symptomatic
 and isolated. It averages Monte-Carlo trajectories to forecast the number of symptomatic
 people.
 
 **New here? Start with the [tutorial](docs/TUTORIAL.md).** It walks through a forecast in
 Docker step by step, with the exact output and plots you should get. The documentation is also
-published at <https://nuzla.github.io/epiinfer/>.
+published at <https://nuzla.github.io/epitrace/>.
 
 The paper's numbers come from three versions of the code, and the library has an engine
 for each:
@@ -33,14 +39,14 @@ from a checkout:
 
 ```bash
 uv sync --all-extras                   # .venv with the locked versions + plots + baselines
-uv run epiinfer --help                 # run any command inside that environment
+uv run epitrace --help                 # run any command inside that environment
 ```
 
 Other routes:
 
 - **Base install.** `uv sync` gives numpy and pandas only. Add `--extra plots` or
   `--extra baselines` for the extras.
-- **Command on your PATH.** `uv tool install ".[all]"` installs the `epiinfer` command.
+- **Command on your PATH.** `uv tool install ".[all]"` installs the `epitrace` command.
 - **pip.** `pip install ".[all]"` works too, but it resolves fresh versions instead of the
   locked ones.
 
@@ -54,44 +60,44 @@ No Python on the host? Use [Docker](#docker) instead.
 ## 60-second tour
 
 ```bash
-uv run epiinfer demo                                   # path to a tiny bundled dataset
-uv run epiinfer describe --data "$(uv run epiinfer demo)"
-uv run epiinfer forecast --data "$(uv run epiinfer demo)" --horizon 14 --plot forecast.png
-uv run epiinfer run --data "$(uv run epiinfer demo)" --method unknown_both --max-day 46 \
+uv run epitrace demo                                   # path to a tiny bundled dataset
+uv run epitrace describe --data "$(uv run epitrace demo)"
+uv run epitrace forecast --data "$(uv run epitrace demo)" --horizon 14 --plot forecast.png
+uv run epitrace run --data "$(uv run epitrace demo)" --method unknown_both --max-day 46 \
     --horizons 1 5 10 --plots
 ```
 
 ```python
-import epiinfer
-epiinfer.forecast("my_dataset/", horizon=14, seed=0)           # mean + 10-90% band
-epiinfer.run("my_dataset/", "unknown_both").summary()           # back-test: RMSE, fRMSE
-epiinfer.run("my_dataset/", "unknown_both", engine="contact")   # the 2025 code instead
+import epitrace
+epitrace.forecast("my_dataset/", horizon=14, seed=0)           # mean + 10-90% band
+epitrace.run("my_dataset/", "unknown_both").summary()           # back-test: RMSE, fRMSE
+epitrace.run("my_dataset/", "unknown_both", engine="contact")   # the 2025 code instead
 ```
 
 Your data is a folder of CSV files; see [docs/DATA_FORMAT.md](docs/DATA_FORMAT.md). For the
 default engine that is two files: who is symptomatic or recovered each day, and who met
-whom. `epiinfer from-cases` builds the folder from a case list and a contact list.
+whom. `epitrace from-cases` builds the folder from a case list and a contact list.
 `examples/forecast_new_data.py` is a runnable template.
 
 ## Reproduce the paper
 
 | Paper table | Command | Agreement |
 |---|---|---|
-| Tables 10–13 (October 2026), EpiInfer-contact | `uv run epiinfer reproduce --table sweep --data DIR` | the authors' summary is recomputed **exactly** from their predictions (192 cells); the engine is bit-exact against their notebook; re-running needs the Base data, which was not supplied |
-| Tables 2–5 / 14, EpiInfer "both known" | `uv run epiinfer reproduce --table epiinfer_age_structured --data DIR` | **exact** |
-| Appendix A: EpiInfer | `uv run epiinfer reproduce --table appendix --scale 0.2 --methods epiinfer_old --data DIR` | **exact**, all 720 cells |
-| `tab:openabm-forecast` | `uv run epiinfer reproduce --table openabm --data DIR` | within 1% |
-| `tab:age_structured`, vs the authors' own run of the same code | `uv run epiinfer reproduce --table age_structured --data DIR` | all 16 cells within 8.3% |
+| Tables 10–13 (October 2026), EpiInfer-contact | `uv run epitrace reproduce --table sweep --data DIR` | the authors' summary is recomputed **exactly** from their predictions (192 cells); the engine is bit-exact against their notebook; re-running needs the Base data, which was not supplied |
+| Tables 2–5 / 14, EpiInfer "both known" | `uv run epitrace reproduce --table epiinfer_age_structured --data DIR` | **exact** |
+| Appendix A: EpiInfer | `uv run epitrace reproduce --table appendix --scale 0.2 --methods epiinfer_old --data DIR` | **exact**, all 720 cells |
+| `tab:openabm-forecast` | `uv run epitrace reproduce --table openabm --data DIR` | within 1% |
+| `tab:age_structured`, vs the authors' own run of the same code | `uv run epitrace reproduce --table age_structured --data DIR` | all 16 cells within 8.3% |
 | `tab:age_structured`, vs the published paper | (same command) | "both known" within 10%; the other modes differ (the paper reports a different run) |
-| ARIMA columns (age-structured, uniform) | `uv run epiinfer reproduce --table arima_age_structured` / `arima_uniform --data DIR` | exact, each on its own dataset |
-| Holt-Winters columns | `uv run epiinfer reproduce --table hw_age_structured` / `hw_uniform --data DIR` | day 1 within 1.5%, day 20 off by 12–19% |
-| Appendix A: ARIMA | `uv run epiinfer reproduce --table appendix --scale 0.2 --methods arima --data DIR` | exact, all 720 cells |
-| Appendix A: EpiInfer-contact | `uv run epiinfer reproduce --table appendix --scale 0.2 --data DIR --jobs 4` | 79% of days 1–8 within 15%; days 9–19 match after a one-day shift (96%) |
+| ARIMA columns (age-structured, uniform) | `uv run epitrace reproduce --table arima_age_structured` / `arima_uniform --data DIR` | exact, each on its own dataset |
+| Holt-Winters columns | `uv run epitrace reproduce --table hw_age_structured` / `hw_uniform --data DIR` | day 1 within 1.5%, day 20 off by 12–19% |
+| Appendix A: ARIMA | `uv run epitrace reproduce --table appendix --scale 0.2 --methods arima --data DIR` | exact, all 720 cells |
+| Appendix A: EpiInfer-contact | `uv run epitrace reproduce --table appendix --scale 0.2 --data DIR --jobs 4` | 79% of days 1–8 within 15%; days 9–19 match after a one-day shift (96%) |
 | `tab:uniform`'s EpiInfer-contact column | | cannot run: the uniform data has no contact list (the notebook behind it is identified) |
 
-**Getting the data.** The exact datasets are release assets: `epiinfer fetch-data --url …`
+**Getting the data.** The exact datasets are release assets: `epitrace fetch-data --url …`
 downloads one and checks it against the SHA-256 hashes shipped in the package.
-`epiinfer simulate` generates statistically equivalent data instead.
+`epitrace simulate` generates statistically equivalent data instead.
 
 **Wrong-data check.** Every `reproduce` run checks that it was given the dataset the paper
 used, by population, number of days and peak. It warns if not.
@@ -117,7 +123,7 @@ comparisons. Its main points:
 
 ## Docker
 
-The image bundles Python, the locked dependencies and every `epiinfer` command, so the only
+The image bundles Python, the locked dependencies and every `epitrace` command, so the only
 thing you need on the host is Docker. Released versions are published to the GitHub container
 registry. CI also builds the image on every push, runs `demo`, `forecast` and `run --plots` in
 it as an arbitrary non-root user, and runs the whole [tutorial](docs/TUTORIAL.md) in it.
@@ -128,19 +134,22 @@ it as an arbitrary non-root user, and runs the whole [tutorial](docs/TUTORIAL.md
 publishes one; see the repository's Packages page for the list.
 
 ```bash
-docker pull ghcr.io/nuzla/epiinfer:0.2.1
-docker tag  ghcr.io/nuzla/epiinfer:0.2.1 epiinfer      # the commands below call it "epiinfer"
+docker pull ghcr.io/nuzla/epitrace:0.3.0
+docker tag  ghcr.io/nuzla/epitrace:0.3.0 epitrace      # the commands below call it "epitrace"
 ```
 
+Versions before 0.3.0 were published as `ghcr.io/nuzla/epiinfer`. Those images stay available
+but get no updates; see the [changelog](CHANGELOG.md) for the rename.
+
 For a paper or a script, pin the exact image by digest, which is printed in each release's
-workflow summary: `ghcr.io/nuzla/epiinfer@sha256:…`. Version tags can be re-pointed; digests
+workflow summary: `ghcr.io/nuzla/epitrace@sha256:…`. Version tags can be re-pointed; digests
 cannot.
 
 **Or build it from this repository:**
 
 ```bash
-docker build -f docker/Dockerfile -t epiinfer .
-docker run --rm epiinfer --version
+docker build -f docker/Dockerfile -t epitrace .
+docker run --rm epitrace --version
 ```
 
 ### 2. How the container is wired
@@ -155,7 +164,7 @@ it writes into `./results` belong to you. Commands below use the shell function
 
 ```bash
 epi() { docker run --rm --user "$(id -u):$(id -g)" \
-          -v "$PWD/data:/data" -v "$PWD/results:/work/results" epiinfer "$@"; }
+          -v "$PWD/data:/data" -v "$PWD/results:/work/results" epitrace "$@"; }
 ```
 
 Paths in the arguments are paths **inside the container**: datasets are under `/data/...`
@@ -221,7 +230,7 @@ and never fakes a result. Everything is written to the results directory.
 `docker/docker-compose.yml` records the same mounts and user:
 
 ```bash
-LOCAL_USER="$(id -u):$(id -g)" docker compose -f docker/docker-compose.yml run --rm epiinfer \
+LOCAL_USER="$(id -u):$(id -g)" docker compose -f docker/docker-compose.yml run --rm epitrace \
     reproduce --table openabm --data /data/openabm --out results/paper
 ```
 
@@ -231,14 +240,14 @@ Most HPC systems run [Apptainer](https://apptainer.org/) (formerly Singularity) 
 Docker. It converts the same image, with nothing extra to install:
 
 ```bash
-apptainer pull epiinfer.sif docker://ghcr.io/nuzla/epiinfer:0.2.1     # once; makes epiinfer.sif
+apptainer pull epitrace.sif docker://ghcr.io/nuzla/epitrace:0.3.0     # once; makes epitrace.sif
 mkdir -p data results
-apptainer run epiinfer.sif --version
-apptainer run --bind "$PWD/data:/data" epiinfer.sif forecast --data /data/my_dataset --out results/forecast.csv
-apptainer run --bind "$PWD/data:/data" epiinfer.sif reproduce --table openabm --data /data/openabm --out results/paper
+apptainer run epitrace.sif --version
+apptainer run --bind "$PWD/data:/data" epitrace.sif forecast --data /data/my_dataset --out results/forecast.csv
+apptainer run --bind "$PWD/data:/data" epitrace.sif reproduce --table openabm --data /data/openabm --out results/paper
 ```
 
-Everything after `epiinfer.sif` is passed straight to `epiinfer`, as with `docker run`.
+Everything after `epitrace.sif` is passed straight to `epitrace`, as with `docker run`.
 Differences from Docker:
 
 - It runs as **you**, so there is no `--user` flag and output files are yours.
@@ -248,7 +257,7 @@ Differences from Docker:
 - `--containall` or `--no-home` stops the current directory from being mounted; if you use
   them, bind `results/` explicitly too: `--bind "$PWD/results:/work/results"`.
 - On SingularityCE, replace `apptainer` with `singularity`; the commands are the same.
-- To pin the exact image: `apptainer pull epiinfer.sif docker://ghcr.io/nuzla/epiinfer@sha256:…`.
+- To pin the exact image: `apptainer pull epitrace.sif docker://ghcr.io/nuzla/epitrace@sha256:…`.
 - Pulling a big image can fill your home quota. Point the cache elsewhere with
   `export APPTAINER_CACHEDIR=/scratch/$USER/apptainer`.
 
@@ -292,7 +301,7 @@ engine also has `--rec-duration` (7), the days a recovered person stays immune. 
 them for your disease.
 
 ARIMA and Holt-Winters baselines follow the authors' notebooks and need the `baselines`
-extra: `uv run epiinfer baseline --data DIR --which arima`.
+extra: `uv run epitrace baseline --data DIR --which arima`.
 
 ## Reproducibility
 
@@ -309,7 +318,7 @@ extra: `uv run epiinfer baseline --data DIR --which arima`.
 
 ```bash
 uv run --all-extras pytest -q                        # unit, golden and regression tests
-EPIINFER_PAPER_DATA=/path/to/data uv run --all-extras pytest -m paper  # vs the paper's data
+EPITRACE_PAPER_DATA=/path/to/data uv run --all-extras pytest -m paper  # vs the paper's data
 uv run --all-extras python tools/mutation_check.py   # breaks key guards one at a time; all must be caught
 uv run ruff check .
 uv lock --check                                      # uv.lock matches pyproject.toml

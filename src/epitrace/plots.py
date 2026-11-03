@@ -1,4 +1,4 @@
-"""Optional figures (needs ``epiinfer[plots]``)."""
+"""Optional figures (needs ``epitrace[plots]``)."""
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ def plot_forecast(result: ForecastResult, out_dir: str | Path) -> Path:
         import matplotlib
     except ImportError as exc:
         raise ImportError("plots need matplotlib: install the extra, e.g. "
-                          "`uv sync --extra plots` or `pip install 'epiinfer[plots]'`") from exc
+                          "`uv sync --extra plots` or `pip install 'epitrace[plots]'`") from exc
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
@@ -45,7 +45,7 @@ def _plt():
         import matplotlib
     except ImportError as exc:
         raise ImportError("plots need matplotlib: install the extra, e.g. "
-                          "`uv sync --extra plots` or `pip install 'epiinfer[plots]'`") from exc
+                          "`uv sync --extra plots` or `pip install 'epitrace[plots]'`") from exc
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
     return plt
@@ -80,7 +80,7 @@ def plot_epidemic(states_total, path, title: str = "Epidemic curve") -> Path:
 
 
 def plot_forecast_band(fc, path, history=None, title: str | None = None) -> Path:
-    """A one-shot forecast (``epiinfer.forecast`` output, group ALL): mean and 10-90% band,
+    """A one-shot forecast (``epitrace.forecast`` output, group ALL): mean and 10-90% band,
     the actual counts where known, and the observed history before the origin."""
     plt = _plt()
     df = fc[fc["group"] == "ALL"].sort_values("target_day")
@@ -118,7 +118,7 @@ def plot_rmse_by_horizon(summaries: dict, path, metric: str = "rmse",
         if metric not in df.columns or "horizon" not in df.columns:
             raise ValueError(f"{label!r}: the summary has no column {metric!r} (it has "
                              f"{list(df.columns)}); frmse_rel is only in the summaries of "
-                             f"`epiinfer run`, not of `epiinfer baseline`")
+                             f"`epitrace run`, not of `epitrace baseline`")
         d = df[df["group"] == "ALL"] if "group" in df.columns else df
         d = d.sort_values("horizon")
         ax.plot(d["horizon"], d[metric], "o-", label=label)

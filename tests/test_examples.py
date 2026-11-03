@@ -17,7 +17,7 @@ def test_convert_case_list_builds_a_usable_dataset(tmp_path):
     on day 2 is symptomatic on days 2-8 and recovered on days 9-15."""
     import pandas as pd
 
-    from epiinfer.final import FinalData
+    from epitrace.final import FinalData
     days = pd.date_range("2026-01-01", periods=30)
     pd.DataFrame({"person": ["X", "Y"], "onset": [days[2], days[20]]}).to_csv(
         tmp_path / "cases.csv", index=False)
@@ -33,7 +33,7 @@ def test_convert_case_list_builds_a_usable_dataset(tmp_path):
     assert [d for d in range(30) if fd.is_inf[d, x]] == list(range(2, 9))
     assert [d for d in range(30) if fd.is_rec[d, x]] == list(range(9, 16))
     assert sum(len(e[0]) for e in fd.edges.values()) == 30
-    from epiinfer.cli import main
+    from epitrace.cli import main
     assert main(["from-cases", "--cases", str(tmp_path / "cases.csv"), "--contacts",
                  str(tmp_path / "contacts.csv"), "--out", str(tmp_path / "cli"),
                  "--duration", "5"]) == 0

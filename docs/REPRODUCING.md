@@ -1,7 +1,7 @@
 # Reproducing the paper
 
 The paper's tables come from three different pieces of code. The library has an engine for
-each, and `epiinfer reproduce` picks the right one for every table:
+each, and `epitrace reproduce` picks the right one for every table:
 
 | Engine | Code it ports | Paper columns | How close |
 |---|---|---|---|
@@ -9,7 +9,7 @@ each, and `epiinfer reproduce` picks the right one for every table:
 | `contact` | `epiinfer_paper_aligned.py`, `epiinfer_empirical_p1.py`, 2025 | EpiInfer-contact in Tables 2–9, 14–17 and Appendix A | OpenABM within 1%; the authors' own age-structured run within 8%; Appendix up to a one-day offset |
 | `compartmental` | `epiinfer for base case.ipynb`, `Epiinfer for C_*.ipynb` | the "EpiInfer" columns (the earlier model) | Appendix A (720 cells) and Tables 2–5 / 14 "both known" exact |
 
-ARIMA and Holt-Winters are separate baselines (`epiinfer baseline`). For why some published
+ARIMA and Holt-Winters are separate baselines (`epitrace baseline`). For why some published
 numbers cannot be matched, see [`PAPER_VS_CODE.md`](PAPER_VS_CODE.md).
 
 ## 1. Get the data
@@ -23,7 +23,7 @@ folder). Folder names below are the ones the commands and the paper-data tests e
 | `data-….zip` | `abmcontact10000aprilnewage/{age_structured, uniform}`: 365-day ABM runs. **`uniform/` has no `timed_edges.csv`** | `aprilnewage_age_structured`, `aprilnewage_uniform` |
 | `Archive.zip` | `abmcontact10000april0.2`, `april0.5`, `april2`: 12 `p1_*_p2_*` scenarios each, 13 age groups, 100 days, contact list included; plus the authors' `RMSE_summary<scale>.xlsx` | `appendix_april0.2`, `appendix_april0.5`, `appendix_april2` |
 | `abm_summary.csv`, `abm_predictions.csv` | the authors' outputs of `abm_final.ipynb` (Tables 10–13) | shipped in the package and the tests |
-| (the earlier `epiinfer/` folder) | `dataset` (the 915-peak age-structured epidemic) and `new_data_set` (= `openabm_run3`) | `age_structured`, `openabm` |
+| (the earlier `epitrace/` folder) | `dataset` (the 915-peak age-structured epidemic) and `new_data_set` (= `openabm_run3`) | `age_structured`, `openabm` |
 
 Not among the files supplied: `uniform/timed_edges.csv`, the unscaled `abmcontact10000` folders
 (Appendix A's "Base" columns and Tables 10–13) and `openabm_run1`.
@@ -31,29 +31,29 @@ Not among the files supplied: `uniform/timed_edges.csv`, the unscaled `abmcontac
 For the paper-data tests put the folders side by side and point at them:
 
 ```bash
-export EPIINFER_PAPER_DATA=/path/to/paperdata    # holds the folder names in the last column
+export EPITRACE_PAPER_DATA=/path/to/paperdata    # holds the folder names in the last column
 uv run --all-extras pytest -m paper
 ```
 
 **Exact datasets for others (recommended).** Archives for a GitHub Release:
 
 ```bash
-uv run epiinfer fetch-data --url https://…/epiinfer-data-openabm.zip --dest data
+uv run epitrace fetch-data --url https://…/epitrace-data-openabm.zip --dest data
 ```
 
 - **Verification.** The download is checked against the SHA-256 recorded in
-  `src/epiinfer/checksums.txt`, which ships with the package. A modified or corrupted
+  `src/epitrace/checksums.txt`, which ships with the package. A modified or corrupted
   archive is refused before it is unpacked.
 - **Building the archives.** `tools/pack_datasets.py` builds the zips deterministically:
   re-packing the same data gives the same hash.
-- **URL.** Set `EPIINFER_DATA_URL` instead of `--url` if you prefer an environment variable.
+- **URL.** Set `EPITRACE_DATA_URL` instead of `--url` if you prefer an environment variable.
   Only the two archives listed in `checksums.txt` have recorded hashes so far.
 
 **Regenerated data.** This is statistically equivalent but not byte-identical:
 
 ```bash
-uv run epiinfer simulate --contact age_structured --out data/sim_age_structured
-uv run epiinfer simulate --contact uniform        --out data/sim_uniform
+uv run epitrace simulate --contact age_structured --out data/sim_age_structured
+uv run epitrace simulate --contact uniform        --out data/sim_uniform
 ```
 
 The defaults (contact matrix × 0.2, seed 123) match the shipped age-structured dataset:
@@ -72,14 +72,14 @@ Use the archived data to check the published numbers.
 
 ```bash
 uv sync --all-extras
-uv run epiinfer reproduce --table openabm              --data data/openabm
-uv run epiinfer reproduce --table age_structured       --data data/age_structured --jobs 4
-uv run epiinfer reproduce --table arima_age_structured --data data/age_structured
-uv run epiinfer reproduce --table arima_uniform        --data data/aprilnewage_uniform
-uv run epiinfer reproduce --table hw_age_structured    --data data/aprilnewage_age_structured
-uv run epiinfer reproduce --table appendix --scale 0.2 --data data/appendix_april0.2 --jobs 4
-uv run epiinfer reproduce --table epiinfer_age_structured --data data/age_structured
-uv run epiinfer reproduce --table sweep --data data/abmcontact10000 --jobs 12   # needs the Base data
+uv run epitrace reproduce --table openabm              --data data/openabm
+uv run epitrace reproduce --table age_structured       --data data/age_structured --jobs 4
+uv run epitrace reproduce --table arima_age_structured --data data/age_structured
+uv run epitrace reproduce --table arima_uniform        --data data/aprilnewage_uniform
+uv run epitrace reproduce --table hw_age_structured    --data data/aprilnewage_age_structured
+uv run epitrace reproduce --table appendix --scale 0.2 --data data/appendix_april0.2 --jobs 4
+uv run epitrace reproduce --table epiinfer_age_structured --data data/age_structured
+uv run epitrace reproduce --table sweep --data data/abmcontact10000 --jobs 12   # needs the Base data
 ```
 
 Each `--table` run writes a CSV and prints a comparison. Its columns are `paper_rmse`, `rmse`,
@@ -121,7 +121,7 @@ numbers. (Running `age_structured` on the `aprilnewage` data therefore warns, co
   Horizons are 1, 5, 10 and 20 (all 20 days for the appendix).
 - **Smoke test.** `--quick` runs a reduced evaluation only. Its numbers are not comparable
   with the paper.
-- **Tests.** `EPIINFER_PAPER_DATA=data uv run --all-extras pytest -m paper` checks the
+- **Tests.** `EPITRACE_PAPER_DATA=data uv run --all-extras pytest -m paper` checks the
   reproducible rows automatically (10 tests, about 12 minutes on an Apple-silicon Mac).
 
 Runtimes were measured on an Apple-silicon Mac, single-threaded per method:
@@ -172,7 +172,7 @@ paper, and the authors' own 13 July run of the same script on the same data
 - **Without look-ahead (`--contacts frozen`)** the picture changes mostly at day 20. For
   example, "both known" gives 126.3 against 158.0, and "both unknown" gives 82.7 against 108.1.
 
-`EPIINFER_PAPER_DATA=data uv run --all-extras pytest -m paper` re-checks all 16 cells against
+`EPITRACE_PAPER_DATA=data uv run --all-extras pytest -m paper` re-checks all 16 cells against
 the authors' run.
 
 ### ARIMA(1,1,1) (`tab:baseline-abs`)

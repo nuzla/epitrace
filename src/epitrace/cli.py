@@ -1,4 +1,4 @@
-"""``epiinfer`` command line."""
+"""``epitrace`` command line."""
 
 from __future__ import annotations
 
@@ -43,8 +43,8 @@ def _engine(p: argparse.ArgumentParser) -> None:
 
 
 def _build() -> argparse.ArgumentParser:
-    ap = argparse.ArgumentParser(prog="epiinfer", description=__doc__)
-    ap.add_argument("--version", action="version", version=f"epiinfer {__version__}")
+    ap = argparse.ArgumentParser(prog="epitrace", description=__doc__)
+    ap.add_argument("--version", action="version", version=f"epitrace {__version__}")
     ap.add_argument("-v", "--verbose", action="store_true")
     sub = ap.add_subparsers(dest="cmd", required=True)
 
@@ -269,14 +269,14 @@ def main(argv: list[str] | None = None) -> int:
         return _main(args)
     except ImportError as exc:                 # a missing optional extra: say which one
         if "install the extra" in str(exc):
-            raise SystemExit(f"epiinfer: {exc}") from None
+            raise SystemExit(f"epitrace: {exc}") from None
         raise
     except (DataFormatError, FileNotFoundError) as exc:     # the user's data, not a bug
-        raise SystemExit(f"epiinfer: {exc}") from None
+        raise SystemExit(f"epitrace: {exc}") from None
     except ValueError as exc:                  # an option the method cannot use: one clear line
         if args.verbose:                       # -v keeps the traceback for bug reports
             raise
-        raise SystemExit(f"epiinfer: {exc}") from None
+        raise SystemExit(f"epitrace: {exc}") from None
 
 
 def _main(args: argparse.Namespace) -> int:
@@ -374,10 +374,10 @@ def _main(args: argparse.Namespace) -> int:
         res = run(args.data, args.method, **over)
         if res.rows.empty:
             raise SystemExit(
-                "epiinfer: no forecast could be scored. The data is too short for these "
+                "epitrace: no forecast could be scored. The data is too short for these "
                 "settings: a forecast origin needs history before it and its target day needs "
                 "data after it. Check --start-eval, --horizons and --max-day against the number "
-                f"of days in the dataset (`epiinfer describe --data {args.data}`).")
+                f"of days in the dataset (`epitrace describe --data {args.data}`).")
         out = Path(args.out)
         out.mkdir(parents=True, exist_ok=True)
         res.rows.to_csv(out / f"predictions_{res.dataset}_{res.method}.csv", index=False)

@@ -2,7 +2,7 @@
 
 Run once (and again only if the demo data changes):
 
-    uv run --all-extras python tools/make_golden.py /path/to/epiinfer tests/golden_original_scripts.json \
+    uv run --all-extras python tools/make_golden.py /path/to/epitrace tests/golden_original_scripts.json \
         [/path/to/baselines_standalone.ipynb]
 
 The library's tests then assert that the refactored package reproduces these numbers
@@ -20,7 +20,7 @@ from pathlib import Path
 
 import numpy as np
 
-DEMO = Path(__file__).resolve().parents[1] / "src" / "epiinfer" / "demo_data"
+DEMO = Path(__file__).resolve().parents[1] / "src" / "epitrace" / "demo_data"
 
 
 def load_module(path: Path, name: str):

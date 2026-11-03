@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from epiinfer.final import (
+from epitrace.final import (
     FinalCalibrator,
     FinalCore,
     FinalData,
@@ -118,7 +118,7 @@ def test_summarize_reproduces_the_authors_summary():
     """abm_summary.csv (the paper's Tables 10-13) is exactly summarize(abm_predictions.csv)."""
     with gzip.open(HERE / "data" / "abm_predictions.csv.gz", "rt") as f:
         pred = pd.read_csv(f)
-    from epiinfer.reproduce.sweep import load_targets
+    from epitrace.reproduce.sweep import load_targets
     want = load_targets()
     got = summarize_relative(pred)
     m = got.merge(want, on=["p1", "p2", "case", "horizon"], suffixes=("", "_paper"))
@@ -135,6 +135,6 @@ def test_known_rates_required():
 
 
 def test_relative_rmse_skips_zero_actuals():
-    from epiinfer.metrics import relative_rmse
+    from epitrace.metrics import relative_rmse
     assert relative_rmse([1, 2, 3], [0, 1, 2]) == pytest.approx(np.sqrt((1 + 0.25) / 2))
     assert np.isnan(relative_rmse([1.0], [0.0]))

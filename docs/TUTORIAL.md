@@ -1,4 +1,4 @@
-# Tutorial: forecast an epidemic with EpiInfer in Docker
+# Tutorial: forecast an epidemic with epiinfer-contact-tracing in Docker
 
 This tutorial takes you from nothing to a forecast, a back-test of how good that forecast is,
 and a comparison with the paper's other methods. Everything runs inside the Docker image, so
@@ -11,7 +11,7 @@ you need nothing installed except Docker.
 3. forecast 14 days ahead from day 60, then check the forecast against what happened;
 4. make a genuine forecast past the end of the data;
 5. back-test: forecast from every day from 25 to 79 and measure the error;
-6. compare EpiInfer-contact (both engines) with the earlier EpiInfer, ARIMA and Holt-Winters;
+6. compare epiinfer-contact-tracing (both engines) with the earlier EpiInfer, ARIMA and Holt-Winters;
 7. convert your own case and contact lists, and forecast with them.
 
 **Time:** about 10 minutes. Step 6's 2025-engine back-test is about 7 of them.
@@ -19,15 +19,15 @@ you need nothing installed except Docker.
 **Same numbers as here.** Steps 1–6 are
 [`docs/tutorial/run_tutorial.sh`](tutorial/run_tutorial.sh), and every table and plot in them
 is that script's output (the files are in
-[`docs/tutorial/outputs`](https://github.com/nuzla/epiinfer/tree/main/docs/tutorial/outputs) and
-[`docs/tutorial/img`](https://github.com/nuzla/epiinfer/tree/main/docs/tutorial/img)). CI runs the script inside the Docker image on every
+[`docs/tutorial/outputs`](https://github.com/nuzla/epitrace/tree/main/docs/tutorial/outputs) and
+[`docs/tutorial/img`](https://github.com/nuzla/epitrace/tree/main/docs/tutorial/img)). CI runs the script inside the Docker image on every
 change and fails if any number differs, so you should get exactly these results. All the
 randomness is seeded.
 
 The numbers were checked on two platforms: the Docker image on Linux (Intel/AMD) and a
 native run on an Apple-silicon Mac:
 
-- **Both EpiInfer-contact engines:** bit-identical.
+- **Both epiinfer-contact-tracing engines:** bit-identical.
 - **The earlier EpiInfer and ARIMA:** equal to better than one part in a billion (last-digit
   rounding).
 - **Holt-Winters:** differs by up to 0.2%, because its statsmodels fit is platform-sensitive.
@@ -54,30 +54,30 @@ docker --version
 Pull the released image (it works on Intel/AMD and ARM, including Apple silicon):
 
 ```bash
-docker pull ghcr.io/nuzla/epiinfer:0.2.1
+docker pull ghcr.io/nuzla/epitrace:0.3.0
 ```
 
 Or build it from a checkout of this repository:
 
 ```bash
-git clone https://github.com/nuzla/epiinfer.git
-cd epiinfer
-docker build -f docker/Dockerfile -t ghcr.io/nuzla/epiinfer:0.2.1 .
+git clone https://github.com/nuzla/epitrace.git
+cd epitrace
+docker build -f docker/Dockerfile -t ghcr.io/nuzla/epitrace:0.3.0 .
 ```
 
 ### Make a working folder and a shortcut
 
 ```bash
-mkdir -p epiinfer-tutorial/data epiinfer-tutorial/results
-cd epiinfer-tutorial
+mkdir -p epitrace-tutorial/data epitrace-tutorial/results
+cd epitrace-tutorial
 ```
 
-The shell function `epi` runs one `epiinfer` command in a fresh container:
+The shell function `epi` runs one `epitrace` command in a fresh container:
 
 ```bash
 epi() { docker run --rm --user "$(id -u):$(id -g)" \
           -v "$PWD/data:/data" -v "$PWD/results:/work/results" \
-          ghcr.io/nuzla/epiinfer:0.2.1 "$@"; }
+          ghcr.io/nuzla/epitrace:0.3.0 "$@"; }
 ```
 
 How the pieces fit together:
@@ -99,7 +99,7 @@ epi --version
 ```
 
 ```text
-epiinfer 0.2.1
+epitrace 0.3.0
 ```
 
 ---
@@ -171,9 +171,9 @@ results/01_epidemic_curve.png
   infections ever become symptomatic.
 - **Usable engines.** This line lists which of the library's three methods can run on the
   folder:
-  - **`final`**: the October 2026 EpiInfer-contact. It needs only who is symptomatic or
+  - **`final`**: the October 2026 epiinfer-contact-tracing. It needs only who is symptomatic or
     recovered, plus the contacts.
-  - **`contact`**: the 2025 EpiInfer-contact. It also needs who is in A, which only
+  - **`contact`**: the 2025 epiinfer-contact-tracing. It also needs who is in A, which only
     simulations record.
   - **`compartmental`**: the earlier EpiInfer. It needs only daily counts per age group.
 
@@ -312,11 +312,11 @@ as the epidemic settles.
 
 ## 6. Compare with the paper's other methods
 
-The paper compares EpiInfer-contact with the earlier EpiInfer, ARIMA, Holt-Winters and an
-LSTM. The library has all but the LSTM. All of the following use the same forecast origins
-(25–79).
+The paper compares epiinfer-contact-tracing (which it calls EpiInfer-contact) with the earlier
+EpiInfer, ARIMA, Holt-Winters and an LSTM. The library has all but the LSTM. All of the
+following use the same forecast origins (25–79).
 
-### 6a. EpiInfer-contact, 2025 engine
+### 6a. epiinfer-contact-tracing, 2025 engine
 
 ```bash
 epi run --data /data/my_epidemic --engine contact --method unknown_both \
@@ -392,8 +392,8 @@ Both use only the daily count of symptomatic people:
 
 ```bash
 epi plot-rmse \
-  "EpiInfer-contact, final engine=results/04_backtest_final/summary_my_epidemic_unknown_both.csv" \
-  "EpiInfer-contact, 2025 engine=results/05_backtest_contact/summary_my_epidemic_unknown_both.csv" \
+  "epiinfer-contact-tracing, final engine=results/04_backtest_final/summary_my_epidemic_unknown_both.csv" \
+  "epiinfer-contact-tracing, 2025 engine=results/05_backtest_contact/summary_my_epidemic_unknown_both.csv" \
   "EpiInfer (earlier)=results/06_backtest_compartmental/summary_my_epidemic_unknown_both.csv" \
   "ARIMA(1,1,1)=results/07_arima.csv" \
   "Holt-Winters=results/07_holt_winters.csv" \
@@ -404,8 +404,8 @@ epi plot-rmse \
 
 | RMSE (people) | 1 day | 5 days | 10 days | 20 days |
 |---|---|---|---|---|
-| EpiInfer-contact, final engine | 22.2 | 49.0 | **35.4** | **62.7** |
-| EpiInfer-contact, 2025 engine (uses the true A) | **11.7** | **34.3** | 52.8 | 83.8 |
+| epiinfer-contact-tracing, final engine | 22.2 | 49.0 | **35.4** | **62.7** |
+| epiinfer-contact-tracing, 2025 engine (uses the true A) | **11.7** | **34.3** | 52.8 | 83.8 |
 | EpiInfer, earlier model | 43.4 | 89.9 | 917.5 | 800.6 |
 | ARIMA(1,1,1) | 22.0 | 87.7 | 116.3 | 122.3 |
 | Holt-Winters | 22.0 | 78.5 | 107.3 | 139.7 |
@@ -414,7 +414,7 @@ epi plot-rmse \
 
 - **Up to 5 days, the 2025 engine is best**, helped by knowing who is pre-symptomatic.
 - **At 10 and 20 days the final engine is best**, without that information.
-- **From day 5 on, both EpiInfer-contact engines beat ARIMA and Holt-Winters.** At day 1 the
+- **From day 5 on, both epiinfer-contact-tracing engines beat ARIMA and Holt-Winters.** At day 1 the
   final engine and the baselines tie (22 people): a day ahead, "tomorrow ≈ today" is hard
   to beat.
 - **The earlier EpiInfer**, with both rates unknown, is the least accurate.
@@ -456,7 +456,7 @@ P2,2026-03-24             2026-03-02,P4062,P8490
 ...                       ...
 ```
 
-`epiinfer from-cases` turns them into a dataset folder. Each case is symptomatic for
+`epitrace from-cases` turns them into a dataset folder. Each case is symptomatic for
 `--duration` days from onset and recovered (immune) for `--rec-duration` days after that:
 
 ```bash
@@ -470,8 +470,8 @@ wrote /data/my_data: 9981 people, days 0-99 (day 0 = 2026-03-02)
 ```
 
 Person labels can be any text; `people.csv` in the output maps the numeric ids back to
-them. In Python the same is `epiinfer.convert.cases_to_dataset`, and
-[`examples/convert_case_list.py`](https://github.com/nuzla/epiinfer/blob/main/examples/convert_case_list.py)
+them. In Python the same is `epitrace.convert.cases_to_dataset`, and
+[`examples/convert_case_list.py`](https://github.com/nuzla/epitrace/blob/main/examples/convert_case_list.py)
 is a script version.
 
 The output above comes from the tutorial epidemic written out as a case list and a contact
@@ -554,8 +554,8 @@ What reproduces and what does not, and why, is in [PAPER_VS_CODE.md](PAPER_VS_CO
 On a cluster without Docker, convert the image once and replace `epi` with:
 
 ```bash
-apptainer pull epiinfer.sif docker://ghcr.io/nuzla/epiinfer:0.2.1
-epi() { apptainer run --bind "$PWD/data:/data" epiinfer.sif "$@"; }
+apptainer pull epitrace.sif docker://ghcr.io/nuzla/epitrace:0.3.0
+epi() { apptainer run --bind "$PWD/data:/data" epitrace.sif "$@"; }
 ```
 
 Run from the folder that holds `data/` and `results/`. Apptainer runs as you, so there is no
@@ -574,7 +574,7 @@ Run from the folder that holds `data/` and `results/`. Apptainer runs as you, so
   `--start-eval 22` or higher (25 is the default).
 - **`no forecast could be scored`.** The data is too short for the `--start-eval` and
   `--horizons` you gave. `describe` shows how many days it has.
-- **Numbers differ from this page.** Check `epi --version` says 0.2.1 and that you kept
+- **Numbers differ from this page.** Check `epi --version` says 0.3.0 and that you kept
   `--seed 123` for `simulate`. CI compares every number on this page with the image on
   every change.
 - **Slow.** The 2025 engine's back-test is the slow step (minutes). Give Docker Desktop

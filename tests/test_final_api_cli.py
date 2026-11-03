@@ -4,10 +4,10 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from epiinfer import FINAL, PAPER, forecast, load_dataset, run
-from epiinfer.cli import main
-from epiinfer.final import FinalData
-from epiinfer.simulate import AgeMixConfig, simulate, write_dataset
+from epitrace import FINAL, PAPER, forecast, load_dataset, run
+from epitrace.cli import main
+from epitrace.final import FinalData
+from epitrace.simulate import AgeMixConfig, simulate, write_dataset
 
 
 def test_final_is_the_default_engine(demo_path):
@@ -106,7 +106,7 @@ def mini_sweep(tmp_path):
 
 
 def test_reproduce_sweep_quick(mini_sweep, tmp_path, capsys):
-    from epiinfer.reproduce.sweep import reproduce_sweep
+    from epitrace.reproduce.sweep import reproduce_sweep
     cmp, pred, trace = reproduce_sweep(mini_sweep, cases=("known_both", "known_p2"), quick=True)
     assert set(cmp["case"]) == {"known_both", "known_p2"} and cmp["paper_RMSE"].notna().all()
     assert cmp["dataset_check"].str.startswith("MISMATCH").all()   # not the paper's Base data

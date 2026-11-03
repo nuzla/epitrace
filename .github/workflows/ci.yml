@@ -29,8 +29,8 @@ jobs:
         if: matrix.python == '3.13'
         run: |
           mkdir "$RUNNER_TEMP/sdist"
-          tar xzf dist/epiinfer-*.tar.gz -C "$RUNNER_TEMP/sdist"
-          cd "$RUNNER_TEMP"/sdist/epiinfer-*/
+          tar xzf dist/epitrace-*.tar.gz -C "$RUNNER_TEMP/sdist"
+          cd "$RUNNER_TEMP"/sdist/epitrace-*/
           uv run --locked --all-extras pytest -q
   workflow-lint:
     runs-on: ubuntu-latest
@@ -62,15 +62,15 @@ jobs:
     needs: test
     steps:
       - uses: actions/checkout@v4
-      - run: docker build -f docker/Dockerfile -t epiinfer:ci .
-      - run: docker run --rm epiinfer:ci --version
+      - run: docker build -f docker/Dockerfile -t epitrace:ci .
+      - run: docker run --rm epitrace:ci --version
       - name: smoke test on the bundled demo data, as an arbitrary non-root uid
         run: |
           mkdir -p results
-          DEMO="$(docker run --rm epiinfer:ci demo)"
-          docker run --rm epiinfer:ci forecast --data "$DEMO" --horizon 3 --num-sims 3
+          DEMO="$(docker run --rm epitrace:ci demo)"
+          docker run --rm epitrace:ci forecast --data "$DEMO" --horizon 3 --num-sims 3
           docker run --rm --user "$(id -u):$(id -g)" -v "$PWD/results:/work/results" \
-            epiinfer:ci run --data "$DEMO" --method empirical_p1 --start-eval 40 --num-sims 2 --plots
+            epitrace:ci run --data "$DEMO" --method empirical_p1 --start-eval 40 --num-sims 2 --plots
           ls results/summary_demo_data_empirical_p1.csv results/forecast_demo_data_empirical_p1.png
       - name: docker/run_all.sh end to end (demo steps; paper tables skipped, no data here)
         run: DATA="$PWD/data-ci" OUT="$PWD/results-ci" docker/run_all.sh
@@ -82,9 +82,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
         with: { version: "${{ env.UV_VERSION }}" }
-      - run: docker build -f docker/Dockerfile -t epiinfer:ci .
+      - run: docker build -f docker/Dockerfile -t epitrace:ci .
       - name: run every tutorial command in the container
-        run: IMAGE=epiinfer:ci WORK="$PWD/tutorial-work" docs/tutorial/run_tutorial.sh
+        run: IMAGE=epitrace:ci WORK="$PWD/tutorial-work" docs/tutorial/run_tutorial.sh
       - uses: actions/upload-artifact@v4
         if: always()
         with: { name: tutorial-results, path: tutorial-work/results }

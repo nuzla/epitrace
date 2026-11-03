@@ -12,7 +12,7 @@ from ..data import load_curve, load_dataset
 from ..forecast import build_model, default_config, rolling_forecast
 from .targets import TABLES
 
-log = logging.getLogger("epiinfer")
+log = logging.getLogger("epitrace")
 
 
 def fingerprint(data) -> tuple[int, int, int]:

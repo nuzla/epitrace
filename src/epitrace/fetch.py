@@ -1,6 +1,6 @@
 """Download and verify dataset archives (the paper's exact datasets, hosted as release assets).
 
-The hosting location is not baked in: pass ``--url`` or set ``EPIINFER_DATA_URL``. The
+The hosting location is not baked in: pass ``--url`` or set ``EPITRACE_DATA_URL``. The
 download is verified against ``--sha256`` if given, otherwise against the published hash
 of that archive name in ``checksums.txt`` (shipped with the package). Archives with no
 known hash are unpacked with a warning that prints their hash.
@@ -39,10 +39,10 @@ def known_checksums() -> dict[str, str]:
 
 def fetch(url: str | None, dest: str | Path, expected_sha256: str | None = None) -> Path:
     """Download ``url`` to ``dest`` and unzip it; refuse to unpack on a checksum mismatch."""
-    url = url or os.environ.get("EPIINFER_DATA_URL")
+    url = url or os.environ.get("EPITRACE_DATA_URL")
     if not url:
-        raise SystemExit("no data URL: pass --url or set EPIINFER_DATA_URL "
-                         "(see docs/REPRODUCING.md), or generate data with `epiinfer simulate`")
+        raise SystemExit("no data URL: pass --url or set EPITRACE_DATA_URL "
+                         "(see docs/REPRODUCING.md), or generate data with `epitrace simulate`")
     parsed = urllib.parse.urlparse(url)
     local = parsed.scheme == "http" and parsed.hostname in ("localhost", "127.0.0.1")
     if parsed.scheme != "https" and not local:

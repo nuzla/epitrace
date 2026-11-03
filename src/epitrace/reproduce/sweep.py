@@ -20,13 +20,13 @@ from .appendix import scenarios
 
 def load_targets() -> pd.DataFrame:
     """The paper's Tables 10-13: p1, p2, case, horizon, RMSE, fRMSE (192 rows)."""
-    with files("epiinfer.reproduce").joinpath("sweep_targets.csv").open() as f:
+    with files("epitrace.reproduce").joinpath("sweep_targets.csv").open() as f:
         return pd.read_csv(f, comment="#")
 
 
 def load_actuals() -> pd.DataFrame:
     """Symptomatic counts of the Base epidemics: p1, p2, day, I (days 26-99)."""
-    with files("epiinfer.reproduce").joinpath("sweep_actuals.csv").open() as f:
+    with files("epitrace.reproduce").joinpath("sweep_actuals.csv").open() as f:
         return pd.read_csv(f, comment="#")
 
 

@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.3.0
+
+**Renamed, to stop confusing this project with EpiInfer.** EpiInfer is the authors' earlier
+system, which uses no contact tracing (the paper's "EpiInfer" columns, our `compartmental`
+engine). This project, which the paper calls EpiInfer-CONTACT, is **epiinfer-contact-tracing**
+in the documentation and **`epitrace`** everywhere in code. Nothing else changes: the 0.3.0
+results are identical to 0.2.1.
+
+This is a clean break, with no `epiinfer` alias. To migrate:
+
+| 0.2.x | 0.3.0 |
+|---|---|
+| `import epiinfer`, `from epiinfer.x import y` | `import epitrace`, `from epitrace.x import y` |
+| `epiinfer run ...` (any command) | `epitrace run ...` |
+| `pip install epiinfer` / package `epiinfer` | package `epitrace` |
+| `ghcr.io/nuzla/epiinfer:0.2.1` | `ghcr.io/nuzla/epitrace:0.3.0` |
+| `EPIINFER_PAPER_DATA`, `EPIINFER_DATA_URL` | `EPITRACE_PAPER_DATA`, `EPITRACE_DATA_URL` |
+| `epiinfer-data-*.zip` (same contents and hashes) | `epitrace-data-*.zip` |
+| github.com/nuzla/epiinfer, nuzla.github.io/epiinfer | github.com/nuzla/epitrace, nuzla.github.io/epitrace |
+
+The old images (`ghcr.io/nuzla/epiinfer`, 0.1.0 to 0.2.1) stay available but receive no updates.
+What keeps the old name, because it names the old system or the paper: the `compartmental`
+engine's `epiinfer_old` appendix method and `epiinfer_age_structured` table, the authors'
+notebook and script names, and the paper's title and column names.
+
 ## 0.2.1
 
 Fixes from a review of 0.2.0. Each has a regression test in `tests/test_robustness.py`, which

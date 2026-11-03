@@ -20,7 +20,7 @@ def test_run_all_script_is_valid_and_executable():
 
 def test_compose_matches_readme_mounts():
     yaml = pytest.importorskip("yaml")
-    svc = yaml.safe_load((ROOT / "docker" / "docker-compose.yml").read_text())["services"]["epiinfer"]
+    svc = yaml.safe_load((ROOT / "docker" / "docker-compose.yml").read_text())["services"]["epitrace"]
     assert svc["build"]["dockerfile"] == "docker/Dockerfile"
     assert sorted(v.split(":")[1] for v in svc["volumes"]) == ["/data", "/work/results"]
     assert "LOCAL_USER" in svc["user"]
@@ -28,7 +28,7 @@ def test_compose_matches_readme_mounts():
 
 def test_readme_docker_commands_use_real_cli_commands():
     """Every `epi <command>` in the README's Docker section must be a real subcommand."""
-    from epiinfer.cli import _build
+    from epitrace.cli import _build
     sub = next(a for a in _build()._actions if a.dest == "cmd")
     readme = (ROOT / "README.md").read_text()
     section = readme[readme.index("## Docker"):readme.index("## Methods")]
@@ -39,7 +39,7 @@ def test_readme_docker_commands_use_real_cli_commands():
 
 def test_dockerfile_uses_locked_install():
     text = (ROOT / "docker" / "Dockerfile").read_text()
-    assert "uv sync --locked" in text and "USER epi" in text and 'ENTRYPOINT ["epiinfer"]' in text
+    assert "uv sync --locked" in text and "USER epi" in text and 'ENTRYPOINT ["epitrace"]' in text
 
 
 def test_dockerfile_base_images_pinned_by_digest():
@@ -72,7 +72,7 @@ def test_dependabot_covers_docker_and_actions():
 
 def test_readme_documents_ghcr_and_apptainer():
     readme = (ROOT / "README.md").read_text()
-    for needle in ("docker pull ghcr.io/nuzla/epiinfer", "apptainer pull epiinfer.sif docker://",
+    for needle in ("docker pull ghcr.io/nuzla/epitrace", "apptainer pull epitrace.sif docker://",
                    "### Apptainer / Singularity", "not been tested", "@sha256"):
         assert needle in readme, needle
     assert (ROOT / "docs" / "RELEASING.md").exists()
