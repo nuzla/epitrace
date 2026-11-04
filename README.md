@@ -6,12 +6,12 @@ The package, the command and the Docker image are called **`epitrace`**. It is p
 that anyone can:
 
 Using Docker, the following tasks can be performed:
-Simulate an epidemic involving 10,000 individuals;
-Generate a 14-day forecast from day 60 and subsequently validate the forecast against observed outcomes;
-Produce an out-of-sample forecast extending beyond the available data;
-Conduct back-testing by generating forecasts from each day between day 25 and day 79, and measure the associated errors;
-Compare epiinfer-contact-tracing (both engines) with the earlier EpiInfer, ARIMA, and Holt-Winters methods;
-Convert users’ own case and contact lists for use in forecasting.
+**Simulate an epidemic involving 10,000 individuals;**
+**Generate a 14-day forecast from day 60 and subsequently validate the forecast against observed outcomes;**
+**Produce an out-of-sample forecast extending beyond the available data;**
+**Conduct back-testing by generating forecasts from each day between day 25 and day 79, and measure the associated errors;**
+**Compare epiinfer-contact-tracing (both engines) with the earlier EpiInfer, ARIMA, and Holt-Winters methods;**
+**Convert users’ own case and contact lists for use in forecasting.**
 
 **New here? Start with the [tutorial](docs/TUTORIAL.md).** It walks through a forecast in
 Docker step by step, with the exact output and plots you should get. The documentation is also
