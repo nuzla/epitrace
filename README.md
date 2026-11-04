@@ -17,15 +17,6 @@ Using Docker, the following tasks can be performed:
 Docker step by step, with the exact output and plots you should get. The documentation is also
 published at <https://nuzla.github.io/epitrace/>.
 
-The paper's numbers come from three versions of the code, and the library has an engine
-for each:
-
-| Engine | What it is | Needs |
-|---|---|---|
-| `final` (default) | the October 2026 method (`abm_final.ipynb`): rebuilds the pre-symptomatic history from infections, recovered people become susceptible again, periodic joint calibration | who is symptomatic or recovered each day, plus the contacts |
-| `contact` | the 2025 code behind most published tables | the above **plus** who is pre-symptomatic (state A), which real data rarely record |
-| `compartmental` | EpiInfer, the earlier model the paper compares against: deterministic, no contact list | daily counts per age group (symptomatic, average contacts) |
-
 ## Install
 
 The project is managed with [uv](https://docs.astral.sh/uv/). `uv.lock` pins every
@@ -74,47 +65,7 @@ default engine that is two files: who is symptomatic or recovered each day, and 
 whom. `epitrace from-cases` builds the folder from a case list and a contact list.
 `examples/forecast_new_data.py` is a runnable template.
 
-## Reproduce the paper
 
-| Paper table | Command | Agreement |
-|---|---|---|
-| Tables 10–13 (October 2026), EpiInfer-contact | `uv run epitrace reproduce --table sweep --data DIR` | the authors' summary is recomputed **exactly** from their predictions (192 cells); the engine is bit-exact against their notebook; re-running needs the Base data, which was not supplied |
-| Tables 2–5 / 14, EpiInfer "both known" | `uv run epitrace reproduce --table epiinfer_age_structured --data DIR` | **exact** |
-| Appendix A: EpiInfer | `uv run epitrace reproduce --table appendix --scale 0.2 --methods epiinfer_old --data DIR` | **exact**, all 720 cells |
-| `tab:openabm-forecast` | `uv run epitrace reproduce --table openabm --data DIR` | within 1% |
-| `tab:age_structured`, vs the authors' own run of the same code | `uv run epitrace reproduce --table age_structured --data DIR` | all 16 cells within 8.3% |
-| `tab:age_structured`, vs the published paper | (same command) | "both known" within 10%; the other modes differ (the paper reports a different run) |
-| ARIMA columns (age-structured, uniform) | `uv run epitrace reproduce --table arima_age_structured` / `arima_uniform --data DIR` | exact, each on its own dataset |
-| Holt-Winters columns | `uv run epitrace reproduce --table hw_age_structured` / `hw_uniform --data DIR` | day 1 within 1.5%, day 20 off by 12–19% |
-| Appendix A: ARIMA | `uv run epitrace reproduce --table appendix --scale 0.2 --methods arima --data DIR` | exact, all 720 cells |
-| Appendix A: EpiInfer-contact | `uv run epitrace reproduce --table appendix --scale 0.2 --data DIR --jobs 4` | 79% of days 1–8 within 15%; days 9–19 match after a one-day shift (96%) |
-| `tab:uniform`'s EpiInfer-contact column | | cannot run: the uniform data has no contact list (the notebook behind it is identified) |
-
-**Getting the data.** The exact datasets are release assets: `epitrace fetch-data --url …`
-downloads one and checks it against the SHA-256 hashes shipped in the package.
-`epitrace simulate` generates statistically equivalent data instead.
-
-**Wrong-data check.** Every `reproduce` run checks that it was given the dataset the paper
-used, by population, number of days and peak. It warns if not.
-
-The steps, runtimes and full results are in [docs/REPRODUCING.md](docs/REPRODUCING.md).
-
-Read [docs/PAPER_VS_CODE.md](docs/PAPER_VS_CODE.md) before relying on the published
-comparisons. Its main points:
-
-- the 2025 code looked ahead at future contacts, and was given the true pre-symptomatic
-  people (the October 2026 method fixes the second);
-- ARIMA was scored on a different, harder window;
-- the Holt-Winters and LSTM columns came from a different simulated epidemic;
-- the paper's Appendix A runs one day ahead of the library from about day 9;
-- the paper's estimated-rate rows are a different run from the authors' own, which the
-  library does reproduce;
-- Tables 10–13 use a new method and a new fRMSE definition, and their ARIMA column mixes two
-  datasets;
-- the earlier EpiInfer's forecasts are made one day further from the data than
-  EpiInfer-contact's;
-- the uniform tables' EpiInfer-contact column came from a notebook that treats susceptible
-  people as the infectious ones.
 
 ## Docker
 
