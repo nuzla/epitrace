@@ -5,18 +5,13 @@ Epidemics Given Contact Tracing Information", Kascelan, Yang & Shasha, *Algorith
 The package, the command and the Docker image are called **`epitrace`**. It is packaged so
 that anyone can:
 
-1. **reproduce** the paper's tables, and
-2. **forecast** with their own contact-tracing data.
-
-**Names.** The paper calls this method *EpiInfer-CONTACT* (its tables say "EpiInfer-contact").
-Here it is *epiinfer-contact-tracing*, to tell it apart from *EpiInfer*, the authors' earlier
-system, which uses no contact tracing. Where this documentation quotes a paper table, it keeps
-the paper's column names.
-
-Given who met whom each day, epiinfer-contact-tracing rolls an S → A → I → R epidemic forward on the
-contact graph. Here A means infectious but not yet symptomatic, and I means symptomatic
-and isolated. It averages Monte-Carlo trajectories to forecast the number of symptomatic
-people.
+Using Docker, the following tasks can be performed:
+Simulate an epidemic involving 10,000 individuals;
+Generate a 14-day forecast from day 60 and subsequently validate the forecast against observed outcomes;
+Produce an out-of-sample forecast extending beyond the available data;
+Conduct back-testing by generating forecasts from each day between day 25 and day 79, and measure the associated errors;
+Compare epiinfer-contact-tracing (both engines) with the earlier EpiInfer, ARIMA, and Holt-Winters methods;
+Convert users’ own case and contact lists for use in forecasting.
 
 **New here? Start with the [tutorial](docs/TUTORIAL.md).** It walks through a forecast in
 Docker step by step, with the exact output and plots you should get. The documentation is also
